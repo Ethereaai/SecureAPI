@@ -1,13 +1,222 @@
+<!-- Additional Affiliate Zones -->
+<div class="ad-slot max-w-5xl mx-auto">[Affiliate Zone #1] Top of page offer</div>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SecureAPI Vite</title>
-  <script type="module" src="/main.js"></script>
+  <title>SecureAPI - Protect Your API Keys Instantly</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+    }
+    .coming-soon-box {
+      background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 10px, #e5e7eb 10px, #e5e7eb 20px);
+    }
+    .ad-slot {
+      margin: 2rem auto;
+      padding: 1rem;
+      max-width: 970px;
+      background: #f9fafb;
+      border: 1px dashed #d1d5db;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+  </style>
 </head>
-<body>
-  <h1>SecureAPI Vite Project</h1>
-  <div id="app"></div>
+<body class="font-inter bg-gray-50 text-gray-800">
+
+  <div class="ad-slot">[Affiliate Zone #2] Just before Hero</div>
+
+  <!-- Hero Section -->
+  <section class="gradient-bg text-white py-24 px-6 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">SecureAPI</h1>
+      <p class="text-lg md:text-xl mb-6">Instantly detect, secure, and deploy API keys in your projects.</p>
+      <a href="#upload" class="inline-block bg-white text-indigo-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition">Try it Free</a>
+    </div>
+  </section>
+
+  <!-- Upload Section -->
+  <section id="upload" class="py-16 px-6 bg-white">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-2xl font-bold mb-4">Upload your project .zip</h2>
+      <form id="uploadForm" class="border border-dashed border-gray-300 p-8 rounded-xl bg-gray-50" enctype="multipart/form-data">
+        <input type="file" name="project" accept=".zip" required class="mb-4">
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-medium">Scan & Secure</button>
+        <div id="loading" class="mt-4 hidden">🔄 Scanning...</div>
+        <div id="result" class="mt-4 text-sm text-green-600 hidden"></div>
+        <div id="error" class="mt-4 text-sm text-red-600 hidden"></div>
+      </form>
+      <div class="ad-slot">[Affiliate Zone #3] Below upload</div>
+    </div>
+  </section>
+
+  <!-- API Generator Section (Pro only) -->
+  <section id="generate" class="py-16 px-6 bg-white">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-2xl font-bold mb-4">Generate an API Boilerplate</h2>
+      <p class="mb-4 text-gray-600">This feature is available for Pro users only.</p>
+      <button id="generateApi" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md font-medium">Generate API (Pro)</button>
+      <div id="genResult" class="mt-4 text-sm text-green-600 hidden"></div>
+      <div id="genError" class="mt-4 text-sm text-red-600 hidden"></div>
+      <div class="ad-slot mt-6">[Affiliate Zone #4] Below API Generator</div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="py-16 px-6 bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Free Plan -->
+        <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
+          <div class="p-6 border-b border-gray-200">
+            <h3 class="text-xl font-semibold mb-1">Free</h3>
+            <p class="text-gray-600 text-sm mb-4">For individuals getting started</p>
+            <div class="flex items-baseline">
+              <span class="text-3xl font-bold">$0</span>
+              <span class="ml-1 text-gray-500">/forever</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <ul class="space-y-3 mb-8">
+              <li class="text-gray-600 text-sm">✔ 3 scans per month</li>
+              <li class="text-gray-600 text-sm">✔ Boilerplate download</li>
+              <li class="text-gray-400 text-sm">✖ No deployment</li>
+              <li class="text-gray-400 text-sm">✖ Ads & no generation</li>
+            </ul>
+            <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-md transition">Get Started</button>
+          </div>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="border-2 border-indigo-500 rounded-xl overflow-hidden hover:shadow-lg transition transform hover:-translate-y-1 shadow-md">
+          <div class="bg-indigo-500 text-white p-3 text-center text-sm font-medium">MOST POPULAR</div>
+          <div class="p-6 border-b border-gray-200">
+            <h3 class="text-xl font-semibold mb-1">Pro</h3>
+            <p class="text-gray-600 text-sm mb-4">For professional developers</p>
+            <div class="flex items-baseline">
+              <span class="text-3xl font-bold">$9</span>
+              <span class="ml-1 text-gray-500">/month</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <ul class="space-y-3 mb-6">
+              <li class="text-gray-600 text-sm">✔ Unlimited scans</li>
+              <li class="text-gray-600 text-sm">✔ One-click deploy</li>
+              <li class="text-gray-600 text-sm">✔ Custom API generator</li>
+              <li class="text-gray-600 text-sm">✔ OpenAPI export</li>
+              <li class="text-gray-600 text-sm">✔ Ad-free + Affiliate bonuses</li>
+            </ul>
+            <button id="upgradePro" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition">Upgrade to Pro</button>
+            <div class="ad-slot mt-4">[Affiliate Zone #5] Offer in Pro card</div>
+          </div>
+        </div>
+
+        <!-- Enterprise Plan -->
+        <div class="coming-soon-box border border-dashed border-gray-300 rounded-xl text-center p-6 flex flex-col justify-center items-center">
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">Enterprise</h3>
+          <p class="text-sm text-gray-500 mb-4">Advanced features and integrations</p>
+          <span class="inline-block bg-indigo-100 text-indigo-700 font-medium px-4 py-1 rounded-full text-sm shadow-sm">
+            🚧 Coming Soon
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 text-center text-sm text-gray-500">
+    © 2025 SecureAPI. All rights reserved.
+    <div class="ad-slot">[Affiliate Zone #6] Footer-wide tool promo</div>
+  </footer>
+
+  <script>
+    document.getElementById('upgradePro').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/.netlify/functions/checkout');
+        const { url } = await res.json();
+        if (url) window.location.href = url;
+      } catch (err) {
+        alert('Failed to start checkout: ' + err.message);
+      }
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const fileInput = form.querySelector('input[type="file"]');
+      const loading = document.getElementById('loading');
+      const result = document.getElementById('result');
+      const error = document.getElementById('error');
+      result.classList.add('hidden');
+      error.classList.add('hidden');
+      loading.classList.remove('hidden');
+
+      const formData = new FormData();
+      formData.append('project', fileInput.files[0]);
+
+      const res = await fetch('/.netlify/functions/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      loading.classList.add('hidden');
+
+      if (data.redirect) {
+        window.location.href = data.redirect;
+        return;
+      }
+
+      if (res.ok) {
+        result.textContent = `✅ Secured keys: ${data.keys.join(', ')}`;
+        result.classList.remove('hidden');
+        if (data.downloadUrl) {
+          const link = document.createElement('a');
+          link.href = data.downloadUrl;
+          link.download = 'secured_project.zip';
+          link.textContent = '⬇️ Download Secured Project';
+          link.className = 'block mt-2 text-blue-600 underline';
+          result.appendChild(link);
+        }
+      } else {
+        error.textContent = data.message || 'Something went wrong.';
+        error.classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('generateApi').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/.netlify/functions/generate');
+        const data = await res.json();
+        if (res.ok && data.link) {
+          const genResult = document.getElementById('genResult');
+          genResult.textContent = '✅ API boilerplate generated!';
+          const link = document.createElement('a');
+          link.href = data.link;
+          link.download = 'api_boilerplate.zip';
+          link.textContent = '⬇️ Download API Boilerplate';
+          link.className = 'block mt-2 text-blue-600 underline';
+          genResult.appendChild(link);
+          genResult.classList.remove('hidden');
+        } else {
+          document.getElementById('genError').textContent = data.message || 'Something went wrong.';
+          document.getElementById('genError').classList.remove('hidden');
+        }
+      } catch (err) {
+        document.getElementById('genError').textContent = err.message;
+        document.getElementById('genError').classList.remove('hidden');
+      }
+    });
+  </script>
 </body>
 </html>

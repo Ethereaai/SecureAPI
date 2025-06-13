@@ -7,8 +7,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "stripe": "^12.0.0",
     "adm-zip": "^0.5.16",
+    "archiver": "^7.0.1",
+    "express": "^5.1.0",
+    "stripe": "^12.0.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
