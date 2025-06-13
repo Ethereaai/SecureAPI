@@ -1,0 +1,14 @@
+# Ignore all node_modules folders
+node_modules/
+functions/node_modules/
+
+# Ignore log files
+*.log
+npm-debug.log*
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore zip output (if you generate any)
+*.zip
