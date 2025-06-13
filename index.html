@@ -8,6 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
     body {
       font-family: 'Inter', sans-serif;
     }
@@ -20,6 +23,31 @@
   </style>
 </head>
 <body class="font-inter bg-gray-50 text-gray-800">
+
+  <!-- HEADER SECTION -->
+  <header class="sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-6">
+          <div class="flex justify-between items-center h-16">
+              <!-- Logo (Text-based to start) -->
+              <a href="#" class="flex items-center">
+                  <i data-lucide="shield-check" class="w-7 h-7 text-indigo-600 mr-2"></i>
+                  <span class="font-bold text-xl text-gray-800">SecureAPI</span>
+              </a>
+  
+              <!-- Navigation Links -->
+              <nav class="hidden md:flex items-center space-x-6">
+                  <a href="#pro-features" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Features</a>
+                  <a href="#guides" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Guides</a>
+                  <a href="#pricing" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Pricing</a>
+              </nav>
+  
+              <!-- CTA Button -->
+              <a href="#upload" class="hidden md:inline-block bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+                  Get Started
+              </a>
+          </div>
+      </div>
+  </header>
 
   <!-- Hero Section -->
   <section class="gradient-bg text-white py-24 px-6 text-center">
@@ -77,34 +105,39 @@
     </div>
   </section>
 
-  <!-- Deployment Affiliate Section -->
+  <!-- LAUNCH & ENHANCE AFFILIATE SECTION (REPLACES DEPLOYMENT SECTION) -->
   <section class="py-20 bg-white">
-    <div class="max-w-5xl mx-auto px-6 text-center">
-        <h3 class="text-3xl font-bold text-gray-800 mb-4">Deploy Your Secured App in One Click</h3>
-        <p class="text-gray-600 mb-10">Your secured project is ready to go live. We recommend these beginner-friendly platforms.</p>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-            <a href="#" title="Visit Vercel" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
-                <img class="h-10 mb-3" src="https://www.svgrepo.com/show/354512/vercel-icon.svg" alt="Vercel">
-                <span class="font-semibold text-gray-700">Vercel</span>
-            </a>
-            <a href="#" title="Visit Netlify" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
-                <img class="h-10 mb-3" src="https://www.svgrepo.com/show/354110/netlify-icon.svg" alt="Netlify">
-                <span class="font-semibold text-gray-700">Netlify</span>
-            </a>
-            <a href="#" title="Visit Railway" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
-                <img class="h-10 mb-3" src="https://www.svgrepo.com/show/374026/railway.svg" alt="Railway">
-                <span class="font-semibold text-gray-700">Railway</span>
-            </a>
-            <a href="#" title="Visit Supabase" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
-                <img class="h-10 mb-3" src="https://www.svgrepo.com/show/374111/supabase.svg" alt="Supabase">
-                <span class="font-semibold text-gray-700">Supabase</span>
-            </a>
-            <a href="#" title="Visit PlanetScale" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
-                <img class="h-10 mb-3" src="https://www.svgrepo.com/show/439281/planetscale.svg" alt="PlanetScale">
-                <span class="font-semibold text-gray-700">PlanetScale</span>
-            </a>
-        </div>
-    </div>
+      <div class="max-w-6xl mx-auto px-6 text-center">
+          <h3 class="text-3xl font-bold text-gray-800 mb-4">The Complete AI App Starter Kit</h3>
+          <p class="text-gray-600 mb-10">Everything you need to deploy, manage, and scale your first AI application, recommended by us.</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <a href="#" title="Visit Netlify" class="relative group flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <div class="absolute top-0 right-0 -mt-2 -mr-2"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Top Payout</span></div>
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/354110/netlify-icon.svg" alt="Netlify"><span class="font-semibold text-gray-700">Netlify</span><span class="text-xs text-gray-500 mt-1">30% Lifetime Commission</span>
+              </a>
+              <a href="#" title="Visit Clerk" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/97495488?s=200&v=4" alt="Clerk"><span class="font-semibold text-gray-700">Clerk</span><span class="text-xs text-gray-500 mt-1">Add User Logins in Minutes</span>
+              </a>
+              <a href="#" title="Visit Resend" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/124233958?s=200&v=4" alt="Resend"><span class="font-semibold text-gray-700">Resend</span><span class="text-xs text-gray-500 mt-1">Reliable Email for Your App</span>
+              </a>
+              <a href="#" title="Visit Helicone" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/114283372?s=200&v=4" alt="Helicone"><span class="font-semibold text-gray-700">Helicone</span><span class="text-xs text-gray-500 mt-1">Monitor & Cache LLMs</span>
+              </a>
+              <a href="#" title="Visit Vercel" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/354512/vercel-icon.svg" alt="Vercel"><span class="font-semibold text-gray-700">Vercel</span><span class="text-xs text-gray-500 mt-1">Great for Next.js</span>
+              </a>
+              <a href="#" title="Visit Apify" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/373432/apify.svg" alt="Apify"><span class="font-semibold text-gray-700">Apify</span><span class="text-xs text-gray-500 mt-1">For Web Scraping & Data</span>
+              </a>
+              <a href="#" title="Visit Supabase" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/374111/supabase.svg" alt="Supabase"><span class="font-semibold text-gray-700">Supabase</span><span class="text-xs text-gray-500 mt-1">Backend & Database</span>
+              </a>
+              <a href="#" title="Visit Railway" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/374026/railway.svg" alt="Railway"><span class="font-semibold text-gray-700">Railway</span><span class="text-xs text-gray-500 mt-1">Flexible Deployments</span>
+              </a>
+          </div>
+      </div>
   </section>
 
   <!-- Pro Features Upsell Section -->
@@ -135,7 +168,7 @@
   </section>
 
   <!-- Pricing Section -->
-  <section class="py-20 px-6 bg-white">
+  <section id="pricing" class="py-20 px-6 bg-white">
     <div class="max-w-6xl mx-auto">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold">Simple, Fair Pricing</h2>
@@ -147,7 +180,7 @@
             <p class="text-gray-600 mb-6">For getting your first projects live.</p>
             <div class="flex items-baseline mb-8"><span class="text-4xl font-bold">$0</span><span class="ml-1 text-gray-500">/forever</span></div>
             <ul class="space-y-3 mb-8 text-gray-600">
-              <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>5 scans per month</li>
+              <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>3 scans per month</li>
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Secure code downloads</li>
               <li class="flex items-center"><i data-lucide="x" class="w-4 h-4 mr-2 text-gray-400"></i>AI Boilerplate Library</li>
               <li class="flex items-center"><i data-lucide="x" class="w-4 h-4 mr-2 text-gray-400"></i>Guided GitHub Actions</li>
@@ -171,17 +204,17 @@
           <span class="inline-block bg-indigo-100 text-indigo-700 font-medium px-4 py-1 rounded-full text-sm shadow-sm">🚧 Coming Soon</span>
         </div>
       </div>
-       <div class="mt-16 text-center">
-            <p class="text-sm text-gray-500 mb-4">Proudly sponsored by</p>
-            <a href="#" class="inline-block">
-                <img src="https://www.svgrepo.com/show/354222/postman-icon.svg" alt="Postman Logo" class="h-10">
+        <div class="mt-16 text-center">
+            <p class="text-sm text-gray-500 mb-4">Proudly sponsored by the #1 API Platform</p>
+            <a href="#" target="_blank" rel="noopener sponsored" class="inline-block grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200">
+              <img src="https://www.svgrepo.com/show/354222/postman-icon.svg" alt="Postman Logo" class="h-12">
             </a>
         </div>
-    </div>
+      </div>
   </section>
 
   <!-- Educational Affiliate Section -->
-  <section class="py-20 px-6 bg-gray-50">
+  <section id="guides" class="py-20 px-6 bg-gray-50">
     <div class="max-w-5xl mx-auto text-center">
         <h3 class="text-3xl font-bold text-gray-800 mb-4">Confused? Let Us Help.</h3>
         <p class="text-gray-600 mb-10">Check out our guides to help you on your journey from idea to live application.</p>
@@ -203,71 +236,64 @@
   </section>
 
   <!-- Footer -->
-  <footer class="bg-white pt-10">
+<footer class="bg-white pt-10">
     <div class="max-w-4xl mx-auto px-6 mb-10">
-      <div class="w-full h-24 bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center text-sm text-gray-400">
-        Developer Ad Slot
-      </div>
+      <a href="#" target="_blank" rel="noopener sponsored" class="block p-6 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all group">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <div class="flex items-center mb-4 md:mb-0 text-left">
+            <img src="https://www.svgrepo.com/show/303478/nordvpn-logo.svg" alt="NordVPN Logo" class="h-10 mr-5">
+            <div>
+              <h4 class="font-bold text-lg">Protect Your Developer Workflow</h4>
+              <p class="text-sm text-gray-400">Secure your connection and keep your projects private with the VPN trusted by developers.</p>
+            </div>
+          </div>
+          <div class="bg-blue-500 text-white font-bold py-2 px-5 rounded-lg group-hover:bg-blue-400 transition-colors flex-shrink-0 mt-4 md:mt-0">
+            Get NordVPN
+          </div>
+        </div>
+      </a>
     </div>
     <div class="py-10 text-center text-sm text-gray-500 border-t">
       © 2025 SecureAPI. All rights reserved.
     </div>
-  </footer>
+</footer>
 
   <script>
     // Initialize Lucide icons
     lucide.createIcons();
-
-    // Simulate API key patterns for demo
     const apiKeyPatterns = ['STRIPE_KEY', 'SENDGRID_KEY', 'AWS_ACCESS_KEY', 'FIREBASE_KEY', 'OPENAI_API_KEY'];
-
-    // --- BUTTON EVENT LISTENERS ---
-
-    // Free signup button
     document.getElementById('freeSignup').addEventListener('click', () => {
       alert('🎉 Welcome to SecureAPI Free! In a real app, this would redirect to signup.');
     });
-
-    // Pro upgrade button
     document.getElementById('upgradePro').addEventListener('click', () => {
       alert('💳 Redirecting to checkout... In a real app, this would open Stripe checkout.');
     });
-
-    // Clear file button
     document.getElementById('clearFile').addEventListener('click', () => {
       const fileInput = document.getElementById('fileInput');
       fileInput.value = '';
       document.getElementById('result').classList.add('hidden');
       document.getElementById('error').classList.add('hidden');
     });
-
-    // Upload form submission
     document.getElementById('uploadForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      
       const fileInput = document.getElementById('fileInput');
       const loading = document.getElementById('loading');
       const result = document.getElementById('result');
       const error = document.getElementById('error');
-      
       result.classList.add('hidden');
       error.classList.add('hidden');
       result.innerHTML = ''; 
-      
       if (!fileInput.files[0]) {
         error.textContent = 'Please select a file to upload.';
         error.classList.remove('hidden');
         return;
       }
-
       if (!fileInput.files[0].name.endsWith('.zip')) {
         error.textContent = 'Please upload a .zip file.';
         error.classList.remove('hidden');
         return;
       }
-      
       loading.classList.remove('hidden');
-      
       setTimeout(() => {
         loading.classList.add('hidden');
         const foundKeys = apiKeyPatterns.slice(0, Math.floor(Math.random() * 3) + 1);
@@ -284,43 +310,28 @@
         result.classList.remove('hidden');
       }, 2000);
     });
-
-    // --- PRO FEATURE GATING ---
-    
-    // Pro feature: Boilerplate button
     document.getElementById('getBoilerplate').addEventListener('click', () => {
       const genError = document.getElementById('genError');
       genError.classList.add('hidden');
-      const isPro = false; // Change to true to test
-      
+      const isPro = false;
       if (!isPro) {
         genError.textContent = '🔒 This feature requires SecureAPI Pro. Please upgrade to continue.';
         genError.classList.remove('hidden');
         return;
       }
-      
       alert('📁 Simulating download of a secure AI boilerplate...');
     });
-
-    // Pro feature: GitHub workflow button
     document.getElementById('generateApi').addEventListener('click', () => {
       const genError = document.getElementById('genError');
       genError.classList.add('hidden');
-      const isPro = false; // Change to true to test
-      
+      const isPro = false;
       if (!isPro) {
         genError.textContent = '🔒 This feature requires SecureAPI Pro. Please upgrade to continue.';
         genError.classList.remove('hidden');
         return;
       }
-      
       alert('⚙️ Simulating setup of a GitHub Action workflow...');
     });
-
-
-    // --- SIMULATED DOWNLOAD FUNCTIONS ---
-
-    // This can be called from the upload success message
     window.downloadSecuredProject = function() {
       alert('📁 In a real app, this would download your secured project as a ZIP file.');
     };
