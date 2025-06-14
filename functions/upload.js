@@ -17,14 +17,12 @@ const ONE_MONTH_IN_MS = 30 * 24 * 60 * 60 * 1000;
 // --- MAIN HANDLER FUNCTION ---
 exports.handler = async function (event) {
   if (event.httpMethod !== "POST") {
-    // Always return errors as JSON
     return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
   }
 
-  // --- DATABASE-DRIVEN RATE LIMITING ---
+  // --- RATE LIMITING ---
   const ip = event.headers['x-nf-client-connection-ip'] || 'anonymous';
-  let count = await redis.get(ip);
-  count = count ? parseInt(count, 10) : 0;
+  let count = await redis.get(ip) || 0;
 
   if (count >= MAX_SCANS_PER_MONTH) {
     return {
@@ -33,54 +31,62 @@ exports.handler = async function (event) {
     };
   }
 
-  // --- SIMPLIFIED FILE HANDLING ---
+  // --- FILE HANDLING ---
   if (!event.body || !event.isBase64Encoded) {
-    return { statusCode: 400, body: JSON.stringify({ error: "No file data received. Please upload a valid .zip file." }) };
+    return { statusCode: 400, body: JSON.stringify({ error: "No file data received." }) };
   }
 
-  // Netlify provides the uploaded file body as a base64 encoded string.
-  // We just need to convert it back to a binary buffer.
   const zipBuffer = Buffer.from(event.body, "base64");
-
   const detectedKeys = [];
+  
+  // Create a NEW zip object in memory to hold the secured files
+  const newZip = new AdmZip();
 
   try {
-    const zip = new AdmZip(zipBuffer);
-    const zipEntries = zip.getEntries();
+    const originalZip = new AdmZip(zipBuffer);
+    const zipEntries = originalZip.getEntries();
 
     zipEntries.forEach((zipEntry) => {
-      // Ignore directories
+      // If it's a directory, just add it to the new zip and continue
       if (zipEntry.isDirectory) {
+        newZip.addFile(zipEntry.entryName, Buffer.alloc(0), '', zipEntry.attr);
         return;
       }
       
-      let content = zip.readAsText(zipEntry);
+      let content = originalZip.readAsText(zipEntry);
       
-      // A more robust regex to find potential keys
-      const regex = /(sk-[a-zA-Z0-9]{20,}|pk_live_[a-zA-Z0-9]{20,}|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/gi;
-      let match;
-      while ((match = regex.exec(content)) !== null) {
-          detectedKeys.push(match[0].length > 30 ? `${match[0].substring(0, 10)}...` : match[0]); // Push a truncated key for display
-      }
+      // THIS IS THE UPGRADED BLOCK YOU IDENTIFIED
+      // The powerful regex to find various keys
+      const regex = /(sk-[a-zA-Z0-9]{20,}|pk_live_[a-zA-Z0-9]{20,}|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|AKIA[0-9A-Z]{16}|(?<![A-Z0-9])[A-Z0-9]{20,}(?![A-Z0-9]))/gi;
+
+      // Replace the found keys and store them in our list
+      const securedContent = content.replace(regex, (match) => {
+        detectedKeys.push(match.length > 30 ? `${match.substring(0, 10)}...` : match);
+        return '***REDACTED_BY_SECUREAPI***';
+      });
+
+      // Add the secured file content to our new zip
+      newZip.addFile(zipEntry.entryName, Buffer.from(securedContent, "utf8"));
     });
 
   } catch (err) {
     console.error("Error processing zip file:", err);
-    return { statusCode: 400, body: JSON.stringify({ error: "Could not process the uploaded .zip file. It may be corrupt or in an invalid format." }) };
+    return { statusCode: 400, body: JSON.stringify({ error: "Could not process the .zip file." }) };
   }
+  
+  // Convert our new, secure zip file to a base64 string for download
+  const downloadData = newZip.toBuffer().toString("base64");
 
   // --- UPDATE DATABASE COUNT ---
   await redis.set(ip, count + 1, { px: ONE_MONTH_IN_MS });
 
   // --- SUCCESS RESPONSE ---
-  // Note: We are no longer modifying and re-zipping the file in this simplified version.
-  // We are just scanning it, which is the core goal.
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       keys: detectedKeys,
-      message: `Scan complete! Found ${detectedKeys.length} potential keys.`,
+      downloadData: downloadData, // The actual data for the download button
       remainingScans: MAX_SCANS_PER_MONTH - (count + 1)
     })
   };

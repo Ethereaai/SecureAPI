@@ -268,12 +268,12 @@
   const resultDiv = document.getElementById('result');
   const errorDiv = document.getElementById('error');
 
-  // A helper function to create a real download link from base64 data
-  function createDownloadLink(filename, base64Data) {
+  // Helper function to create a real download link from the base64 data
+  function createDownloadButton(filename, base64Data) {
       const link = document.createElement('a');
       link.href = `data:application/zip;base64,${base64Data}`;
       link.download = filename;
-      link.className = "mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition";
+      link.className = "mt-4 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
       link.innerHTML = '⬇️ Download Secured Project';
       return link;
   }
@@ -283,6 +283,7 @@
     
     resultDiv.classList.add('hidden');
     errorDiv.classList.add('hidden');
+    resultDiv.innerHTML = '';
     
     if (!fileInput.files[0]) {
       errorDiv.textContent = 'Please select a file to upload.';
@@ -304,20 +305,26 @@
         throw new Error(data.error || 'An unknown server error occurred.');
       }
       
-      resultDiv.innerHTML = ''; 
-
       const successMessage = document.createElement('div');
-      successMessage.className = "text-green-600";
-      successMessage.innerHTML = `✅ ${data.message} You have ${data.remainingScans} scans left.`;
+      successMessage.className = "text-green-600 text-left";
       
       if(data.keys.length > 0) {
+        successMessage.innerHTML = `✅ Scan complete! Found and secured ${data.keys.length} potential key(s). You have ${data.remainingScans} scans left.`;
+        
         const keyList = document.createElement('div');
-        keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-2 rounded';
-        keyList.textContent = data.keys.join(', ');
+        keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
+        keyList.innerHTML = '<strong>Found Keys:</strong><br>' + data.keys.join('<br>');
         successMessage.appendChild(keyList);
+      } else {
+        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. Your project is secure. You have ${data.remainingScans} scans left.`;
       }
 
       resultDiv.appendChild(successMessage);
+
+      // Add the download button
+      const downloadButton = createDownloadButton('secured-project.zip', data.downloadData);
+      resultDiv.appendChild(downloadButton);
+      
       resultDiv.classList.remove('hidden');
 
     } catch (err) {
@@ -328,8 +335,12 @@
     }
   });
 
-  // Your other button listeners can stay here
-  document.getElementById('clearFile').addEventListener('click', () => { /* ... */ });
+  // Your other listeners like clearFile, etc.
+  document.getElementById('clearFile').addEventListener('click', () => {
+      fileInput.value = '';
+      resultDiv.classList.add('hidden');
+      errorDiv.classList.add('hidden');
+  });
 </script>
 </body>
 </html>
