@@ -238,7 +238,7 @@
     </div>
   </footer>
 
-  <script>
+    <script>
   // Initialize Lucide icons
   lucide.createIcons();
 
@@ -343,32 +343,41 @@
       
       const successMessage = document.createElement('div');
       successMessage.className = "text-left";
-
+      
       if (data.keys.length > 0) {
-        successMessage.innerHTML = `<p class="text-green-600">✅ Success! Your project has been refactored to use a new <strong>.env</strong> file. You have ${data.remainingScans} scans left.</p>`;
-
+        successMessage.innerHTML = `<p class="text-green-600">✅ Success! Refactored ${data.keys.length} key(s) into a new <strong>.env</strong> file.</p>`;
         const keyList = document.createElement('div');
         keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
         keyList.innerHTML = '<strong>Created Environment Variables:</strong><br>' + data.keys.join('<br>');
         successMessage.appendChild(keyList);
-
         const instruction = document.createElement('p');
         instruction.className = 'mt-2 text-sm text-gray-600';
-        instruction.textContent = 'Check the new README-SECUREAPI.md file in your downloaded .zip for instructions on how to run your secured project.';
+        instruction.textContent = 'Check the new README-SECUREAPI.md file in your downloaded .zip for instructions.';
         successMessage.appendChild(instruction);
+      }
+      
+      // --- NEW: Handle warnings ---
+      if (data.warnings && data.warnings.length > 0) {
+        const warningBox = document.createElement('div');
+        warningBox.className = 'mt-4 text-left p-3 rounded-md bg-yellow-50 text-yellow-800';
+        warningBox.innerHTML = `⚠️ <strong>Warning:</strong> Found ${data.warnings.length} other potential secret(s) that could not be automatically refactored. Please review them manually:`;
+        const warningList = document.createElement('div');
+        warningList.className = 'mt-2 font-mono text-sm';
+        warningList.innerHTML = data.warnings.join('<br>');
+        warningBox.appendChild(warningList);
+        successMessage.appendChild(warningBox);
+      }
 
-      } else {
+      // If nothing at all was found
+      if (data.keys.length === 0 && (!data.warnings || data.warnings.length === 0)) {
         successMessage.innerHTML = `<p class="text-green-600">✅ Scan complete! No hardcoded keys found to secure. Your project looks good! You have ${data.remainingScans} scans left.</p>`;
       }
-      resultDiv.appendChild(successMessage);
-
-      // --- START: NEW CODE FOR BUTTONS ---
       
-      // Create a container for the action buttons
+      resultDiv.appendChild(successMessage);
+      
       const buttonContainer = document.createElement('div');
       buttonContainer.className = 'mt-4 flex flex-wrap items-center justify-center gap-4';
 
-      // Create the Download button
       const downloadButton = document.createElement('a');
       downloadButton.href = `data:application/zip;base64,${data.downloadData}`;
       downloadButton.download = 'secured-project.zip';
@@ -376,17 +385,14 @@
       downloadButton.innerHTML = '⬇️ Download Secured Project';
       buttonContainer.appendChild(downloadButton);
 
-      // Create the "Upload Another File" button
       const uploadAnotherButton = document.createElement('button');
       uploadAnotherButton.type = 'button';
       uploadAnotherButton.className = "inline-block bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2 rounded-md text-sm font-semibold transition";
       uploadAnotherButton.textContent = 'Scan Another File';
-      uploadAnotherButton.addEventListener('click', resetUI); // The magic happens here!
+      uploadAnotherButton.addEventListener('click', resetUI);
       buttonContainer.appendChild(uploadAnotherButton);
       
       resultDiv.appendChild(buttonContainer);
-      // --- END: NEW CODE FOR BUTTONS ---
-
       resultDiv.classList.remove('hidden');
 
     } catch (err) {

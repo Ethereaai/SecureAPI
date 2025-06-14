@@ -11,7 +11,6 @@ const redis = new Redis({
 const MAX_SCANS_PER_MONTH = 3;
 const ONE_MONTH_IN_MS = 30 * 24 * 60 * 60 * 1000;
 
-// This is the new instruction file content
 const readmeContent = `# Your Project Has Been Secured by SecureAPI!
 
 We've moved your hardcoded API keys and secrets into a new '.env' file.
@@ -57,26 +56,23 @@ exports.handler = async function (event) {
   let zipBuffer;
   try {
     const requestBody = JSON.parse(event.body);
-    if (!requestBody.fileData) {
-      return { statusCode: 400, body: JSON.stringify({ error: "No file data in request." }) };
-    }
     zipBuffer = Buffer.from(requestBody.fileData, "base64");
   } catch (parseError) {
     return { statusCode: 400, body: JSON.stringify({ error: `Invalid request format: ${parseError.message}` }) };
   }
 
-  // --- START OF NEW LOGIC ---
   const environmentVariables = {};
+  const warnings = new Set(); // Use a Set to avoid duplicate warnings
   const newZip = new AdmZip();
 
   try {
     const originalZip = new AdmZip(zipBuffer);
     
-    // This more powerful regex captures the variable name and the secret.
-    // Group 1: 'const', 'let', or 'var'
-    // Group 2: The variable name (e.g., 'openAIKey')
-    // Group 3: The secret value itself
-    const secretRegex = /(const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*['"]((?:sk|pk_live)_[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16})['"]/gi;
+    // Regex for keys assigned to variables (for refactoring)
+    const refactorRegex = /(const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*['"]((?:sk|pk_live)_[a-zA-Z0-9]{40,}|AKIA[0-9A-Z]{16})['"]/gi;
+    
+    // Regex for any other suspicious keys (for warnings)
+    const warningRegex = /(?:['"]|[^a-zA-Z0-9])((sk|pk_live)_[a-zA-Z0-9]{40,}|AKIA[0-9A-Z]{16})(?:['"]|[^a-zA-Z0-9])/gi;
 
     originalZip.getEntries().forEach((zipEntry) => {
       if (zipEntry.isDirectory) {
@@ -85,25 +81,27 @@ exports.handler = async function (event) {
       }
       let content = originalZip.readAsText(zipEntry);
 
-      // We now refactor the code instead of just redacting it
-      const securedContent = content.replace(secretRegex, (match, declaration, varName, secret) => {
-        // Best practice: ENV_VAR_NAMES are in uppercase
+      // --- PASS 1: Refactor what we can ---
+      let securedContent = content.replace(refactorRegex, (match, declaration, varName, secret) => {
         const envVarName = varName.replace(/([A-Z])/g, '_$1').toUpperCase();
         environmentVariables[envVarName] = secret;
-        
-        // Return the refactored line of code
         return `${declaration} ${varName} = process.env.${envVarName};`;
       });
+
+      // --- PASS 2: Find other keys and add warnings ---
+      let match;
+      while ((match = warningRegex.exec(securedContent)) !== null) {
+         // Add a truncated version to the warnings
+         warnings.add(`${match[1].substring(0, 15)}...`);
+      }
 
       newZip.addFile(zipEntry.entryName, Buffer.from(securedContent, "utf8"));
     });
 
-    // If we found any secrets, create the .env file and a helpful README
     if (Object.keys(environmentVariables).length > 0) {
       const envContent = Object.entries(environmentVariables)
         .map(([key, value]) => `${key}="${value}"`)
         .join('\n');
-        
       newZip.addFile('.env', Buffer.from(envContent, "utf8"));
       newZip.addFile('README-SECUREAPI.md', Buffer.from(readmeContent, "utf8"));
     }
@@ -116,14 +114,14 @@ exports.handler = async function (event) {
   const downloadData = newZip.toBuffer().toString("base64");
   await redis.set(ip, count + 1, { px: ONE_MONTH_IN_MS });
   
-  // Return the names of the environment variables we created for a better success message
-  const createdEnvVars = Object.keys(environmentVariables);
+  const refactoredKeys = Object.keys(environmentVariables);
 
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      keys: createdEnvVars, // Now sending the ENV_VAR names
+      keys: refactoredKeys,
+      warnings: Array.from(warnings), // Convert Set to Array for JSON
       downloadData: downloadData,
       remainingScans: MAX_SCANS_PER_MONTH - (count + 1)
     })
