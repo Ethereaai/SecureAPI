@@ -238,7 +238,7 @@
     </div>
   </footer>
 
-    <script>
+      <script>
   // Initialize Lucide icons
   lucide.createIcons();
 
@@ -341,39 +341,47 @@
           throw new Error(data.error || `Server responded with status ${response.status}`);
       }
       
-      const successMessage = document.createElement('div');
-      successMessage.className = "text-left";
-      
-      if (data.keys.length > 0) {
-        successMessage.innerHTML = `<p class="text-green-600">✅ Success! Refactored ${data.keys.length} key(s) into a new <strong>.env</strong> file.</p>`;
+      const resultContainer = document.createElement('div');
+      resultContainer.className = "text-left space-y-4";
+      let foundSomething = false;
+
+      // Handle refactored keys
+      if (data.refactoredKeys && data.refactoredKeys.length > 0) {
+        foundSomething = true;
+        const refactorBox = document.createElement('div');
+        refactorBox.innerHTML = `<p class="text-green-600 font-semibold">✅ Success! Refactored ${data.refactoredKeys.length} key(s) into a new <strong>.env</strong> file.</p>`;
         const keyList = document.createElement('div');
         keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
-        keyList.innerHTML = '<strong>Created Environment Variables:</strong><br>' + data.keys.join('<br>');
-        successMessage.appendChild(keyList);
+        keyList.innerHTML = '<strong>Created Environment Variables:</strong><br>' + data.refactoredKeys.join('<br>');
+        refactorBox.appendChild(keyList);
         const instruction = document.createElement('p');
         instruction.className = 'mt-2 text-sm text-gray-600';
         instruction.textContent = 'Check the new README-SECUREAPI.md file in your downloaded .zip for instructions.';
-        successMessage.appendChild(instruction);
-      }
-      
-      // --- NEW: Handle warnings ---
-      if (data.warnings && data.warnings.length > 0) {
-        const warningBox = document.createElement('div');
-        warningBox.className = 'mt-4 text-left p-3 rounded-md bg-yellow-50 text-yellow-800';
-        warningBox.innerHTML = `⚠️ <strong>Warning:</strong> Found ${data.warnings.length} other potential secret(s) that could not be automatically refactored. Please review them manually:`;
-        const warningList = document.createElement('div');
-        warningList.className = 'mt-2 font-mono text-sm';
-        warningList.innerHTML = data.warnings.join('<br>');
-        warningBox.appendChild(warningList);
-        successMessage.appendChild(warningBox);
+        refactorBox.appendChild(instruction);
+        resultContainer.appendChild(refactorBox);
       }
 
-      // If nothing at all was found
-      if (data.keys.length === 0 && (!data.warnings || data.warnings.length === 0)) {
-        successMessage.innerHTML = `<p class="text-green-600">✅ Scan complete! No hardcoded keys found to secure. Your project looks good! You have ${data.remainingScans} scans left.</p>`;
+      // Handle redacted keys
+      if (data.redactedKeys && data.redactedKeys.length > 0) {
+        foundSomething = true;
+        const warningBox = document.createElement('div');
+        warningBox.className = 'p-3 rounded-md bg-yellow-50 text-yellow-800';
+        warningBox.innerHTML = `⚠️ <strong>Warning:</strong> Found and redacted ${data.redactedKeys.length} other potential secret(s). These require manual review:`;
+        const warningList = document.createElement('div');
+        warningList.className = 'mt-2 font-mono text-sm';
+        warningList.innerHTML = data.redactedKeys.join('<br>');
+        warningBox.appendChild(warningList);
+        resultContainer.appendChild(warningBox);
       }
       
-      resultDiv.appendChild(successMessage);
+      // Handle the "nothing found" case
+      if (!foundSomething) {
+        const nothingFoundBox = document.createElement('div');
+        nothingFoundBox.innerHTML = `<p class="text-green-600">✅ Scan complete! No hardcoded keys found to secure. Your project looks good! You have ${data.remainingScans} scans left.</p>`;
+        resultContainer.appendChild(nothingFoundBox);
+      }
+      
+      resultDiv.appendChild(resultContainer);
       
       const buttonContainer = document.createElement('div');
       buttonContainer.className = 'mt-4 flex flex-wrap items-center justify-center gap-4';

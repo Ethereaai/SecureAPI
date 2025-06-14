@@ -13,7 +13,13 @@ const ONE_MONTH_IN_MS = 30 * 24 * 60 * 60 * 1000;
 
 const readmeContent = `# Your Project Has Been Secured by SecureAPI!
 
-We've moved your hardcoded API keys and secrets into a new '.env' file.
+We've moved your hardcoded API keys and secrets into a new '.env' file where possible.
+
+## What We Did:
+
+1.  **Refactored Keys:** For any key we found assigned to a variable (e.g., \`const myKey = "..."\`), we moved it to the new \`.env\` file and updated your code to use \`process.env.MY_KEY\`. You just need to install a package to read the .env file.
+
+2.  **Redacted Keys:** For any other long, secret-looking strings that we couldn't automatically refactor, we replaced them with \`***REDACTED_BY_SECUREAPI***\`. This prevents them from being exposed. You will need to review these and handle them manually, perhaps by creating a new entry in the .env file for them.
 
 ## Required Steps:
 
@@ -29,7 +35,7 @@ We've moved your hardcoded API keys and secrets into a new '.env' file.
     require('dotenv').config();
     \`\`\`
 
-That's it! Your application will now securely load keys from the '.env' file instead of having them exposed in your code.
+That's it! Your application will now securely load the refactored keys.
 
 **IMPORTANT:** Remember to add the '.env' file to your '.gitignore' to prevent it from being committed to your repository.
 `;
@@ -62,34 +68,40 @@ exports.handler = async function (event) {
   }
 
   const environmentVariables = {};
+  const redactedKeys = new Set();
   const newZip = new AdmZip();
 
   try {
     const originalZip = new AdmZip(zipBuffer);
     
-    // --- THE AGREED-UPON LOGIC ---
-    // A simple, powerful rule: any string of 20+ alphanumeric characters is a potential secret.
-    const keyPattern = "([a-zA-Z0-9]{20,})";
-    
-    // This regex looks for a key assigned to a variable.
+    // Rule: Any string of 20+ letters, numbers, or underscores.
+    const keyPattern = "([a-zA-Z0-9_]{20,})";
     const refactorRegex = new RegExp(`(const|let|var)\\s+([a-zA-Z0-9_]+)\\s*=\\s*['"]${keyPattern}['"]`, 'gi');
-    // --- END OF LOGIC ---
+    const redactRegex = new RegExp(keyPattern, 'g');
 
     originalZip.getEntries().forEach((zipEntry) => {
       if (zipEntry.isDirectory) {
-        newZip.addFile(zipEntry.entryName, Buffer.alloc(0), '', zipEntry.attr);
+        newZip.addFile(zipEntry.entryName, Buffer.from(0), '', zipEntry.attr);
         return;
       }
       let content = originalZip.readAsText(zipEntry);
       
-      // We only need one pass now. This finds and refactors everything.
-      let securedContent = content.replace(refactorRegex, (match, declaration, varName, secret) => {
+      // --- PASS 1: Smart Refactor ---
+      let refactoredContent = content.replace(refactorRegex, (match, declaration, varName, secret) => {
         const envVarName = varName.replace(/([A-Z])/g, '_$1').toUpperCase();
         environmentVariables[envVarName] = secret;
         return `${declaration} ${varName} = process.env.${envVarName};`;
       });
 
-      newZip.addFile(zipEntry.entryName, Buffer.from(securedContent, "utf8"));
+      // --- PASS 2: Aggressive Redaction ---
+      // This runs on the *already modified* content. Any key it finds now
+      // is one that was not assigned to a variable.
+      let finalContent = refactoredContent.replace(redactRegex, (key) => {
+        redactedKeys.add(`${key.substring(0, 15)}...`);
+        return `***REDACTED_BY_SECUREAPI***`;
+      });
+
+      newZip.addFile(zipEntry.entryName, Buffer.from(finalContent, "utf8"));
     });
 
     if (Object.keys(environmentVariables).length > 0) {
@@ -107,15 +119,13 @@ exports.handler = async function (event) {
   
   const downloadData = newZip.toBuffer().toString("base64");
   await redis.set(ip, count + 1, { px: ONE_MONTH_IN_MS });
-  
-  const refactoredKeys = Object.keys(environmentVariables);
 
-  // We no longer need the 'warnings' system as this single rule is comprehensive.
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      keys: refactoredKeys,
+      refactoredKeys: Object.keys(environmentVariables),
+      redactedKeys: Array.from(redactedKeys),
       downloadData: downloadData,
       remainingScans: MAX_SCANS_PER_MONTH - (count + 1)
     })
