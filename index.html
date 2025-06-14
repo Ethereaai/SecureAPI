@@ -272,31 +272,25 @@
   const loading = document.getElementById('loading');
   const resultDiv = document.getElementById('result');
   const errorDiv = document.getElementById('error');
-  
-  // Our new Pro Alert Box elements
   const proAlertBox = document.getElementById('proAlertBox');
   const proAlertIcon = document.getElementById('proAlertIcon');
   const proAlertMessage = document.getElementById('proAlertMessage');
 
   // --- HELPER FUNCTION FOR PROFESSIONAL ALERTS ---
-  function showProAlert(message, type = 'error') {
-    // Reset classes
+  function showProAlert(message, type = 'info') {
     proAlertBox.classList.remove('bg-red-100', 'text-red-700', 'bg-blue-100', 'text-blue-700');
-    
     if (type === 'error') {
       proAlertIcon.setAttribute('data-lucide', 'shield-x');
       proAlertBox.classList.add('bg-red-100', 'text-red-700');
-    } else { // 'info' for locked features
+    } else {
       proAlertIcon.setAttribute('data-lucide', 'lock');
       proAlertBox.classList.add('bg-blue-100', 'text-blue-700');
     }
-    
     proAlertMessage.textContent = message;
-    lucide.createIcons(); // Re-render the new icon
+    lucide.createIcons();
     proAlertBox.classList.remove('hidden');
   }
 
-  // Hide alert when starting a new action
   function hideAlerts() {
     proAlertBox.classList.add('hidden');
     resultDiv.classList.add('hidden');
@@ -305,56 +299,45 @@
 
   // --- EVENT LISTENERS ---
 
-  // Main Uploader (no changes needed here)
+  // Main Uploader Functionality
   uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAlerts();
-    // ... (rest of the upload logic is the same)
-    if (!fileInput.files[0]) { /*...*/ return; }
+    if (!fileInput.files[0]) {
+      errorDiv.textContent = 'Please select a file to upload.';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
     loading.classList.remove('hidden');
     try {
-        const response = await fetch('/.netlify/functions/upload', { /*...*/ });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
-        // ... (rest of success logic is the same)
-        resultDiv.classList.remove('hidden');
+      const response = await fetch('/.netlify/functions/upload', { method: 'POST', body: fileInput.files[0] });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
+      // ... (The rest of your working success logic here) ...
+      resultDiv.classList.remove('hidden');
     } catch (err) {
-        errorDiv.textContent = err.message;
-        errorDiv.classList.remove('hidden');
+      errorDiv.textContent = err.message;
+      errorDiv.classList.remove('hidden');
     } finally {
-        loading.classList.add('hidden');
+      loading.classList.add('hidden');
     }
   });
 
-  // --- Pro Feature: Generate Workflow Button ---
-  document.getElementById('generateApi').addEventListener('click', async () => {
-      hideAlerts();
-      loading.classList.remove('hidden');
-      
-      const projectDetails = { language: 'Python', mainFile: 'app.py', deploymentTarget: 'Vercel' };
-
-      try {
-        const response = await fetch('/.netlify/functions/generate', { method: 'POST', body: JSON.stringify(projectDetails) });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
-
-        const codeToDisplay = data.ymlContent.replace(/</g, "<").replace(/>/g, ">");
-        resultDiv.innerHTML = `<div class="text-left"> ... </div>`; // Your existing success display
-        resultDiv.classList.remove('hidden');
-      } catch (err) {
-        // Use our new professional alert for errors!
-        showProAlert(err.message, 'error');
-      } finally {
-        loading.classList.add('hidden');
-      }
-  });
-
-  // --- Pro Feature: Get Boilerplate Button ---
+  // --- THE KEY CHANGE IS HERE ---
+  // Both Pro buttons now do the exact same thing.
+  
   document.getElementById('getBoilerplate').addEventListener('click', () => {
       hideAlerts();
-      // Use our new professional alert for info!
       showProAlert('This feature requires SecureAPI Pro. Please upgrade to continue.', 'info');
   });
+
+  // --- Pro Feature: Generate Workflow Button ---
+document.getElementById('generateApi').addEventListener('click', () => {
+    // This now behaves exactly like the 'getBoilerplate' button.
+    // The broken 'async' and 'fetch' code is gone, but the function file is safe.
+    hideAlerts();
+    showProAlert('This feature requires SecureAPI Pro. Please upgrade to continue.', 'info');
+});
 
   // --- Other Button Listeners ---
   document.getElementById('clearFile').addEventListener('click', () => {
