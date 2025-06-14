@@ -1,6 +1,7 @@
 // functions/generate.js
 
-// We are NOT using the 'openai' library anymore. We use the built-in fetch.
+// This is the crucial line we were missing.
+const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
@@ -30,20 +31,13 @@ exports.handler = async function (event) {
     5. The entire output must be ONLY the YAML code, enclosed in a single markdown code block with the language set to yaml. Do not include any other text or explanations.
   `;
 
-  // --- We build the request manually ---
-
-  // The specific API endpoint for OpenRouter's chat completions
   const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
-
-  // The headers required by OpenRouter
   const headers = {
     'Authorization': `Bearer ${process.env.FREE_MODEL_API_KEY}`,
     'Content-Type': 'application/json',
     'HTTP-Referer': 'https://secureapi.online',
     'X-Title': 'SecureAPI',
   };
-
-  // The body of the request, formatted as JSON
   const body = JSON.stringify({
     model: 'mistralai/devstral-small',
     messages: [{ role: 'user', content: prompt }],
@@ -51,7 +45,6 @@ exports.handler = async function (event) {
   });
 
   try {
-    // We use the standard 'fetch' command. No library, no magic.
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: headers,
@@ -60,7 +53,6 @@ exports.handler = async function (event) {
 
     const data = await response.json();
 
-    // If the response is not OK, we throw the error from the API itself.
     if (!response.ok) {
       console.error('OpenRouter API Error:', data);
       throw new Error(data.error?.message || 'Failed to generate workflow file.');
