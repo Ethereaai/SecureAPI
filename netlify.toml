@@ -2,8 +2,10 @@
   publish = "dist"
   command = "npm run build"
 
+# This is the single, correct [functions] block
 [functions]
   directory = "functions"
+  timeout = 25
 
 [dev]
   framework = "vite"
@@ -15,4 +17,4 @@
   force = true
 
 [[plugins]]
-package = "@netlify/plugin-functions-install-core"
+  package = "@netlify/plugin-functions-install-core"
