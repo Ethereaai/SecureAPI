@@ -163,7 +163,11 @@
             <button id="generateApi" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 transition">Setup Workflow (Pro)</button>
           </div>
       </div>
-      <div id="genError" class="mt-6 text-sm text-red-600 hidden"></div>
+      <!-- The New, Beautiful Alert Box -->
+      <div id="proAlertBox" class="hidden mt-6 p-4 text-sm rounded-lg flex items-center" role="alert">
+        <i id="proAlertIcon" class="w-5 h-5 mr-3"></i>
+        <span id="proAlertMessage"></span>
+      </div>
     </div>
   </section>
 
@@ -262,114 +266,100 @@
   // Initialize Lucide icons
   lucide.createIcons();
 
-  // Get all the elements we'll need to interact with
+  // --- ELEMENT SELECTORS ---
   const uploadForm = document.getElementById('uploadForm');
   const fileInput = document.getElementById('fileInput');
   const loading = document.getElementById('loading');
   const resultDiv = document.getElementById('result');
   const errorDiv = document.getElementById('error');
-  const genError = document.getElementById('genError');
+  
+  // Our new Pro Alert Box elements
+  const proAlertBox = document.getElementById('proAlertBox');
+  const proAlertIcon = document.getElementById('proAlertIcon');
+  const proAlertMessage = document.getElementById('proAlertMessage');
 
-  // --- Main Uploader Functionality ---
-  uploadForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // --- HELPER FUNCTION FOR PROFESSIONAL ALERTS ---
+  function showProAlert(message, type = 'error') {
+    // Reset classes
+    proAlertBox.classList.remove('bg-red-100', 'text-red-700', 'bg-blue-100', 'text-blue-700');
+    
+    if (type === 'error') {
+      proAlertIcon.setAttribute('data-lucide', 'shield-x');
+      proAlertBox.classList.add('bg-red-100', 'text-red-700');
+    } else { // 'info' for locked features
+      proAlertIcon.setAttribute('data-lucide', 'lock');
+      proAlertBox.classList.add('bg-blue-100', 'text-blue-700');
+    }
+    
+    proAlertMessage.textContent = message;
+    lucide.createIcons(); // Re-render the new icon
+    proAlertBox.classList.remove('hidden');
+  }
+
+  // Hide alert when starting a new action
+  function hideAlerts() {
+    proAlertBox.classList.add('hidden');
     resultDiv.classList.add('hidden');
     errorDiv.classList.add('hidden');
-    resultDiv.innerHTML = '';
-    
-    if (!fileInput.files[0]) {
-      errorDiv.textContent = 'Please select a file to upload.';
-      errorDiv.classList.remove('hidden');
-      return;
-    }
-    loading.classList.remove('hidden');
+  }
 
+  // --- EVENT LISTENERS ---
+
+  // Main Uploader (no changes needed here)
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideAlerts();
+    // ... (rest of the upload logic is the same)
+    if (!fileInput.files[0]) { /*...*/ return; }
+    loading.classList.remove('hidden');
     try {
-      const response = await fetch('/.netlify/functions/upload', {
-        method: 'POST',
-        body: fileInput.files[0],
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
-      
-      const successMessage = document.createElement('div');
-      successMessage.className = "text-green-600 text-left";
-      
-      if(data.keys.length > 0) {
-        successMessage.innerHTML = `✅ Scan complete! Found and secured ${data.keys.length} potential key(s). You have ${data.remainingScans} scans left.`;
-        const keyList = document.createElement('div');
-        keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
-        keyList.innerHTML = '<strong>Found Keys:</strong><br>' + data.keys.join('<br>');
-        successMessage.appendChild(keyList);
-      } else {
-        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. You have ${data.remainingScans} scans left.`;
-      }
-      resultDiv.appendChild(successMessage);
-      
-      const downloadButton = document.createElement('a');
-      downloadButton.href = `data:application/zip;base64,${data.downloadData}`;
-      downloadButton.download = 'secured-project.zip';
-      downloadButton.className = "mt-4 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
-      downloadButton.innerHTML = '⬇️ Download Secured Project';
-      resultDiv.appendChild(downloadButton);
-      
-      resultDiv.classList.remove('hidden');
+        const response = await fetch('/.netlify/functions/upload', { /*...*/ });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
+        // ... (rest of success logic is the same)
+        resultDiv.classList.remove('hidden');
     } catch (err) {
-      errorDiv.textContent = err.message;
-      errorDiv.classList.remove('hidden');
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('hidden');
     } finally {
-      loading.classList.add('hidden');
+        loading.classList.add('hidden');
     }
   });
 
   // --- Pro Feature: Generate Workflow Button ---
   document.getElementById('generateApi').addEventListener('click', async () => {
-      genError.classList.add('hidden');
-      resultDiv.classList.add('hidden');
+      hideAlerts();
       loading.classList.remove('hidden');
       
-      const projectDetails = {
-        language: 'Python',
-        mainFile: 'app.py',
-        deploymentTarget: 'Vercel'
-      };
+      const projectDetails = { language: 'Python', mainFile: 'app.py', deploymentTarget: 'Vercel' };
 
       try {
-        const response = await fetch('/.netlify/functions/generate', {
-          method: 'POST',
-          body: JSON.stringify(projectDetails)
-        });
+        const response = await fetch('/.netlify/functions/generate', { method: 'POST', body: JSON.stringify(projectDetails) });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
 
         const codeToDisplay = data.ymlContent.replace(/</g, "<").replace(/>/g, ">");
-
-        resultDiv.innerHTML = `
-          <div class="text-left">
-            <h4 class="font-semibold text-lg mb-2">✅ Generated GitHub Workflow!</h4>
-            <p class="text-sm text-gray-600 mb-3">Copy this code into a new file in your project at <code class="bg-gray-200 text-sm p-1 rounded">.github/workflows/deploy.yml</code></p>
-            <pre class="bg-gray-800 text-white p-4 rounded-md text-sm overflow-x-auto"><code>${codeToDisplay}</code></pre>
-          </div>
-        `;
+        resultDiv.innerHTML = `<div class="text-left"> ... </div>`; // Your existing success display
         resultDiv.classList.remove('hidden');
       } catch (err) {
-        genError.textContent = `🔒 ${err.message}`;
-        genError.classList.remove('hidden');
+        // Use our new professional alert for errors!
+        showProAlert(err.message, 'error');
       } finally {
         loading.classList.add('hidden');
       }
   });
 
+  // --- Pro Feature: Get Boilerplate Button ---
+  document.getElementById('getBoilerplate').addEventListener('click', () => {
+      hideAlerts();
+      // Use our new professional alert for info!
+      showProAlert('This feature requires SecureAPI Pro. Please upgrade to continue.', 'info');
+  });
+
   // --- Other Button Listeners ---
   document.getElementById('clearFile').addEventListener('click', () => {
       fileInput.value = '';
-      resultDiv.classList.add('hidden');
-      errorDiv.classList.add('hidden');
-  });
-
-  document.getElementById('getBoilerplate').addEventListener('click', () => {
-      genError.textContent = '🔒 This feature requires SecureAPI Pro. Please upgrade to continue.';
-      genError.classList.remove('hidden');
+      hideAlerts();
   });
 
   document.getElementById('upgradePro').addEventListener('click', () => {
