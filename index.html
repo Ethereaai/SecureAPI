@@ -356,25 +356,32 @@
       
       const successMessage = document.createElement('div');
       successMessage.className = "text-green-600 text-left";
-      
-      if(data.keys.length > 0) {
-        successMessage.innerHTML = `✅ Scan complete! Found and secured ${data.keys.length} potential key(s). You have ${data.remainingScans} scans left.`;
+
+      if (data.keys.length > 0) {
+        successMessage.innerHTML = `✅ Success! Your project has been refactored to use a new <strong>.env</strong> file. You have ${data.remainingScans} scans left.`;
+
         const keyList = document.createElement('div');
         keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
-        keyList.innerHTML = '<strong>Found Keys:</strong><br>' + data.keys.join('<br>');
+        keyList.innerHTML = '<strong>Created Environment Variables:</strong><br>' + data.keys.join('<br>');
         successMessage.appendChild(keyList);
+
+        const instruction = document.createElement('p');
+        instruction.className = 'mt-2 text-sm text-gray-600';
+        instruction.textContent = 'Check the new README-SECUREAPI.md file in your downloaded .zip for instructions on how to run your secured project.';
+        successMessage.appendChild(instruction);
+
       } else {
-        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. You have ${data.remainingScans} scans left.`;
+        successMessage.innerHTML = `✅ Scan complete! No hardcoded keys found to secure. Your project looks good! You have ${data.remainingScans} scans left.`;
       }
       resultDiv.appendChild(successMessage);
-      
+
       const downloadButton = document.createElement('a');
       downloadButton.href = `data:application/zip;base64,${data.downloadData}`;
       downloadButton.download = 'secured-project.zip';
       downloadButton.className = "mt-4 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
       downloadButton.innerHTML = '⬇️ Download Secured Project';
       resultDiv.appendChild(downloadButton);
-      
+
       resultDiv.classList.remove('hidden');
 
     } catch (err) {
