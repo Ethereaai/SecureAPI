@@ -2,9 +2,18 @@
 
 const OpenAI = require('openai');
 
+// This is the critical change. We create a custom fetch function
+// to ensure all requests go ONLY to the OpenRouter baseURL.
+const customFetch = (url, options) => {
+  const newUrl = new URL(url, process.env.FREE_MODEL_BASE_URL).toString();
+  return fetch(newUrl, options);
+};
+
+// Now we initialize the client with this custom fetch behavior.
 const api = new OpenAI({
   apiKey: process.env.FREE_MODEL_API_KEY,
-  baseURL: process.env.FREE_MODEL_BASE_URL,
+  baseURL: process.env.FREE_MODEL_BASE_URL, // Keep this for completeness
+  fetch: customFetch, // This forces the client to use our custom logic
   defaultHeaders: {
     'HTTP-Referer': 'https://secureapi.online',
     'X-Title': 'SecureAPI',
