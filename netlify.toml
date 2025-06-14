@@ -2,9 +2,11 @@
   publish = "dist"
   command = "npm run build"
 
-# This is the single, correct [functions] block
 [functions]
   directory = "functions"
+
+# This is the new, correct way to set a global timeout
+[functions."*"]
   timeout = 25
 
 [dev]
