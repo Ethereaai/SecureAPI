@@ -342,7 +342,6 @@
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
 
-        // This line is now CORRECTED to properly display the code
         const codeToDisplay = data.ymlContent.replace(/</g, "<").replace(/>/g, ">");
 
         resultDiv.innerHTML = `

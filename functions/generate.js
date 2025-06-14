@@ -1,19 +1,16 @@
 // functions/generate.js
 
-// Use 'require' to be consistent with your other function
 const OpenAI = require('openai');
 
-// Initialize the OpenAI client to talk to OpenRouter
 const api = new OpenAI({
   apiKey: process.env.FREE_MODEL_API_KEY,
   baseURL: process.env.FREE_MODEL_BASE_URL,
   defaultHeaders: {
-    'HTTP-Referer': 'https://secureapi.online', // Your site URL
-    'X-Title': 'SecureAPI', // Your project's name
+    'HTTP-Referer': 'https://secureapi.online',
+    'X-Title': 'SecureAPI',
   },
 });
 
-// Use 'exports.handler' to be consistent
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
