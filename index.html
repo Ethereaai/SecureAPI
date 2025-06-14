@@ -292,40 +292,32 @@
 
     loading.classList.remove('hidden');
 
-    const formData = new FormData();
-    formData.append('project', fileInput.files[0]);
-
     try {
-      // We call our serverless function at the correct endpoint
       const response = await fetch('/.netlify/functions/upload', {
         method: 'POST',
-        body: fileInput.files[0], // Sending the file directly is simpler for Netlify Functions
+        body: fileInput.files[0],
       });
       
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'An unknown error occurred.');
+        throw new Error(data.error || 'An unknown server error occurred.');
       }
       
-      // Clear previous content
       resultDiv.innerHTML = ''; 
 
-      // Build the success message
       const successMessage = document.createElement('div');
       successMessage.className = "text-green-600";
+      successMessage.innerHTML = `✅ ${data.message} You have ${data.remainingScans} scans left.`;
+      
       if(data.keys.length > 0) {
-        successMessage.innerHTML = `✅ Scan complete! Found and secured ${data.keys.length} key(s). You have ${data.remainingScans} scans left.`;
-      } else {
-        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. You have ${data.remainingScans} scans left.`;
+        const keyList = document.createElement('div');
+        keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-2 rounded';
+        keyList.textContent = data.keys.join(', ');
+        successMessage.appendChild(keyList);
       }
 
       resultDiv.appendChild(successMessage);
-      
-      // Create and add the download link
-      const downloadButton = createDownloadLink('secured-project.zip', data.downloadData);
-      resultDiv.appendChild(downloadButton);
-
       resultDiv.classList.remove('hidden');
 
     } catch (err) {
