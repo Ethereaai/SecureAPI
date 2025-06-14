@@ -262,25 +262,17 @@
   // Initialize Lucide icons
   lucide.createIcons();
 
+  // Get all the elements we'll need to interact with
   const uploadForm = document.getElementById('uploadForm');
   const fileInput = document.getElementById('fileInput');
   const loading = document.getElementById('loading');
   const resultDiv = document.getElementById('result');
   const errorDiv = document.getElementById('error');
+  const genError = document.getElementById('genError');
 
-  // Helper function to create a real download link from the base64 data
-  function createDownloadButton(filename, base64Data) {
-      const link = document.createElement('a');
-      link.href = `data:application/zip;base64,${base64Data}`;
-      link.download = filename;
-      link.className = "mt-4 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
-      link.innerHTML = '⬇️ Download Secured Project';
-      return link;
-  }
-
+  // --- Main Uploader Functionality ---
   uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
     resultDiv.classList.add('hidden');
     errorDiv.classList.add('hidden');
     resultDiv.innerHTML = '';
@@ -290,7 +282,6 @@
       errorDiv.classList.remove('hidden');
       return;
     }
-
     loading.classList.remove('hidden');
 
     try {
@@ -298,35 +289,31 @@
         method: 'POST',
         body: fileInput.files[0],
       });
-      
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'An unknown server error occurred.');
-      }
+      if (!response.ok) throw new Error(data.error);
       
       const successMessage = document.createElement('div');
       successMessage.className = "text-green-600 text-left";
       
       if(data.keys.length > 0) {
         successMessage.innerHTML = `✅ Scan complete! Found and secured ${data.keys.length} potential key(s). You have ${data.remainingScans} scans left.`;
-        
         const keyList = document.createElement('div');
         keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
         keyList.innerHTML = '<strong>Found Keys:</strong><br>' + data.keys.join('<br>');
         successMessage.appendChild(keyList);
       } else {
-        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. Your project is secure. You have ${data.remainingScans} scans left.`;
+        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. You have ${data.remainingScans} scans left.`;
       }
-
       resultDiv.appendChild(successMessage);
-
-      // Add the download button
-      const downloadButton = createDownloadButton('secured-project.zip', data.downloadData);
+      
+      const downloadButton = document.createElement('a');
+      downloadButton.href = `data:application/zip;base64,${data.downloadData}`;
+      downloadButton.download = 'secured-project.zip';
+      downloadButton.className = "mt-4 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
+      downloadButton.innerHTML = '⬇️ Download Secured Project';
       resultDiv.appendChild(downloadButton);
       
       resultDiv.classList.remove('hidden');
-
     } catch (err) {
       errorDiv.textContent = err.message;
       errorDiv.classList.remove('hidden');
@@ -335,12 +322,64 @@
     }
   });
 
-  // Your other listeners like clearFile, etc.
+  // --- Pro Feature: Generate Workflow Button ---
+  document.getElementById('generateApi').addEventListener('click', async () => {
+      genError.classList.add('hidden');
+      resultDiv.classList.add('hidden');
+      loading.classList.remove('hidden');
+      
+      const projectDetails = {
+        language: 'Python',
+        mainFile: 'app.py',
+        deploymentTarget: 'Vercel'
+      };
+
+      try {
+        const response = await fetch('/.netlify/functions/generate', {
+          method: 'POST',
+          body: JSON.stringify(projectDetails)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error);
+
+        resultDiv.innerHTML = `
+          <div class="text-left">
+            <h4 class="font-semibold text-lg mb-2">✅ Generated GitHub Workflow!</h4>
+            <p class="text-sm text-gray-600 mb-3">Copy this code into a new file in your project at <code class="bg-gray-200 text-sm p-1 rounded">.github/workflows/deploy.yml</code></p>
+            <pre class="bg-gray-800 text-white p-4 rounded-md text-sm overflow-x-auto"><code>${data.ymlContent.replace(/</g, "<").replace(/>/g, ">")}</code></pre>
+          </div>
+        `;
+        resultDiv.classList.remove('hidden');
+      } catch (err) {
+        genError.textContent = `🔒 ${err.message}`;
+        genError.classList.remove('hidden');
+      } finally {
+        loading.classList.add('hidden');
+      }
+  });
+
+  // --- Other Button Listeners ---
   document.getElementById('clearFile').addEventListener('click', () => {
       fileInput.value = '';
       resultDiv.classList.add('hidden');
       errorDiv.classList.add('hidden');
   });
+
+  document.getElementById('getBoilerplate').addEventListener('click', () => {
+      genError.textContent = '🔒 This feature requires SecureAPI Pro. Please upgrade to continue.';
+      genError.classList.remove('hidden');
+  });
+
+  // This brings back your Stripe popup alert
+  document.getElementById('upgradePro').addEventListener('click', () => {
+      alert('💳 Redirecting to checkout... In a real app, this would open Stripe checkout.');
+  });
+  
+  // This makes the pricing "Get Started" button scroll to the upload section
+  document.getElementById('freeSignup').addEventListener('click', () => {
+      document.querySelector('#upload').scrollIntoView({ behavior: 'smooth' });
+  });
+
 </script>
 </body>
 </html>
