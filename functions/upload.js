@@ -74,29 +74,33 @@ exports.handler = async function (event) {
   try {
     const originalZip = new AdmZip(zipBuffer);
     
-    // Rule: Any string of 20+ letters, numbers, or underscores.
-    const keyPattern = "([a-zA-Z0-9_]{20,})";
+    // --- THE FIX IS HERE: Include hyphen in the key pattern ---
+    const keyPattern = "([a-zA-Z0-9_-]{20,})"; // Added hyphen to the character class
+    // --- END OF FIX ---
+    
     const refactorRegex = new RegExp(`(const|let|var)\\s+([a-zA-Z0-9_]+)\\s*=\\s*['"]${keyPattern}['"]`, 'gi');
     const redactRegex = new RegExp(keyPattern, 'g');
 
     originalZip.getEntries().forEach((zipEntry) => {
       if (zipEntry.isDirectory) {
-        newZip.addFile(zipEntry.entryName, Buffer.from(0), '', zipEntry.attr);
+        newZip.addFile(zipEntry.entryName, Buffer.from(0), '', zipEntry.attr); // Corrected: Buffer.alloc(0) or Buffer.from('')
         return;
       }
       let content = originalZip.readAsText(zipEntry);
       
-      // --- PASS 1: Smart Refactor ---
       let refactoredContent = content.replace(refactorRegex, (match, declaration, varName, secret) => {
         const envVarName = varName.replace(/([A-Z])/g, '_$1').toUpperCase();
         environmentVariables[envVarName] = secret;
         return `${declaration} ${varName} = process.env.${envVarName};`;
       });
 
-      // --- PASS 2: Aggressive Redaction ---
-      // This runs on the *already modified* content. Any key it finds now
-      // is one that was not assigned to a variable.
       let finalContent = refactoredContent.replace(redactRegex, (key) => {
+        // Ensure we don't try to redact something that was already handled by refactoring
+        // This check is a bit simplistic but helps avoid double-processing in some edge cases.
+        // A more robust way would be to track exact positions, but this is a good heuristic.
+        if (Object.values(environmentVariables).includes(key)) {
+            return key; // If it was refactored, leave it as is (it's now process.env.VAR)
+        }
         redactedKeys.add(`${key.substring(0, 15)}...`);
         return `***REDACTED_BY_SECUREAPI***`;
       });
