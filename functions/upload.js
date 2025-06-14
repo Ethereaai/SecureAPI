@@ -48,7 +48,7 @@ exports.handler = async function (event) {
       let content = originalZip.readAsText(zipEntry);
       const regex = /(sk-[a-zA-Z0-9]{20,}|pk_live_[a-zA-Z0-9]{20,}|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|AKIA[0-9A-Z]{16}|(?<![A-Z0-9])[A-Z0-9]{20,}(?![A-Z0-9]))/gi;
       const securedContent = content.replace(regex, (match) => {
-        detectedKeys.push(.length > 30 ? `${match.substring(0, 10)}...` : match);
+        detectedKeys.push(match.length > 30 ? `${match.substring(0, 10)}...` : match);
         return '***REDACTED_BY_SECUREAPI***';
       });
       newZip.addFile(zipEntry.entryName, Buffer.from(securedContent, "utf8"));
