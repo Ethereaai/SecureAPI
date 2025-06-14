@@ -29,12 +29,21 @@ exports.handler = async function (event) {
     };
   }
 
-  // --- FILE HANDLING LOGIC (This was already correct) ---
-  if (!event.body || !event.isBase64Encoded) {
+  // --- FILE HANDLING LOGIC ---
+  if (!event.body) {
     return { statusCode: 400, body: JSON.stringify({ error: "No file data received." }) };
   }
 
-  const zipBuffer = Buffer.from(event.body, "base64");
+  let zipBuffer;
+  try {
+    const requestBody = JSON.parse(event.body);
+    if (!requestBody.fileData) {
+      return { statusCode: 400, body: JSON.stringify({ error: "No file data in request." }) };
+    }
+    zipBuffer = Buffer.from(requestBody.fileData, "base64");
+  } catch (parseError) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Invalid request format." }) };
+  }
   const detectedKeys = [];
   const newZip = new AdmZip();
 
