@@ -11,33 +11,29 @@ const redis = new Redis({
 const MAX_SCANS_PER_MONTH = 3;
 const ONE_MONTH_IN_MS = 30 * 24 * 60 * 60 * 1000;
 
+// Helper function to escape special characters for use in a RegExp
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 const readmeContent = `# Your Project Has Been Secured by SecureAPI!
 
 We've moved your hardcoded API keys and secrets into a new '.env' file where possible.
 
 ## What We Did:
 
-1.  **Refactored Keys:** For any key we found assigned to a variable (e.g., \`const myKey = "..."\`), we moved it to the new \`.env\` file and updated your code to use \`process.env.MY_KEY\`. You just need to install a package to read the .env file.
+1.  **Refactored Keys:** For any API key we found assigned to a variable (e.g., \`const myKey = "..."\`), we moved it to the new \`.env\` file and updated your code to use \`process.env.MY_KEY\`.
 
-2.  **Redacted Keys:** For any other long, secret-looking strings that we couldn't automatically refactor, we replaced them with \`***REDACTED_BY_SECUREAPI***\`. This prevents them from being exposed. You will need to review these and handle them manually, perhaps by creating a new entry in the .env file for them.
+2.  **Redacted Secrets:** We replaced the following with \`***REDACTED_BY_SECUREAPI***\`:
+    *   Any email addresses.
+    *   Any API keys we couldn't automatically refactor.
 
 ## Required Steps:
 
-1.  **Install the 'dotenv' package:**
-    Open your terminal in the project directory and run:
-    \`\`\`bash
-    npm install dotenv
-    \`\`\`
+1.  **Install 'dotenv':** Run \`npm install dotenv\` in your project.
+2.  **Load Variables:** Add \`require('dotenv').config();\` to the top of your main script.
 
-2.  **Load the environment variables:**
-    At the very top of your application's main entry file (e.g., index.js, app.js), add the following line:
-    \`\`\`javascript
-    require('dotenv').config();
-    \`\`\`
-
-That's it! Your application will now securely load the refactored keys.
-
-**IMPORTANT:** Remember to add the '.env' file to your '.gitignore' to prevent it from being committed to your repository.
+**IMPORTANT:** Add the '.env' file to your '.gitignore' to prevent committing it.
 `;
 
 exports.handler = async function (event) {
@@ -49,10 +45,7 @@ exports.handler = async function (event) {
   const count = parseInt(await redis.get(ip) || 0, 10);
 
   if (count >= MAX_SCANS_PER_MONTH) {
-    return {
-      statusCode: 429,
-      body: JSON.stringify({ error: "You have reached your free scan limit. Please upgrade to Pro." }),
-    };
+    return { statusCode: 429, body: JSON.stringify({ error: "You have reached your free scan limit." }) };
   }
   
   if (!event.body) {
@@ -61,52 +54,57 @@ exports.handler = async function (event) {
 
   let zipBuffer;
   try {
-    const requestBody = JSON.parse(event.body);
-    zipBuffer = Buffer.from(requestBody.fileData, "base64");
+    zipBuffer = Buffer.from(JSON.parse(event.body).fileData, "base64");
   } catch (parseError) {
-    return { statusCode: 400, body: JSON.stringify({ error: `Invalid request format: ${parseError.message}` }) };
+    return { statusCode: 400, body: JSON.stringify({ error: `Invalid request format.` }) };
   }
 
   const environmentVariables = {};
-  const redactedKeys = new Set();
+  const redactedSecrets = new Set();
   const newZip = new AdmZip();
+  const redactionString = '***REDACTED_BY_SECUREAPI***';
 
   try {
     const originalZip = new AdmZip(zipBuffer);
-    
-    const keyPattern = "([a-zA-Z0-9_-]{20,})";
-    const refactorRegex = new RegExp(`(const|let|var)\\s+([a-zA-Z0-9_]+)\\s*=\\s*['"]${keyPattern}['"]`, 'gi');
-    const redactRegex = new RegExp(keyPattern, 'g');
-    const redactionString = '***REDACTED_BY_SECUREAPI***';
+    const regex = /(sk-[a-zA-Z0-9]{20,}|pk_live_[a-zA-Z0-9]{20,}|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|AKIA[0-9A-Z]{16}|(?<![A-Z0-9])[A-Z0-9]{20,}(?![A-Z0-9]))/gi;
 
     originalZip.getEntries().forEach((zipEntry) => {
       if (zipEntry.isDirectory) {
         newZip.addFile(zipEntry.entryName, Buffer.alloc(0), '', zipEntry.attr);
         return;
       }
-      let content = originalZip.readAsText(zipEntry);
+      let content = originalZip.readAsText(zipEntry, "utf8");
+      let refactoredContent = content;
       
-      let refactoredContent = content.replace(refactorRegex, (match, declaration, varName, secret) => {
+      // PASS 1: Smart Refactor (only for API keys, not emails)
+      refactoredContent = content.replace(/(const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*['"](sk-[a-zA-Z0-9]{20,}|pk_live_[a-zA-Z0-9]{20,}|AKIA[0-9A-Z]{16}|(?<![A-Z0-9])[A-Z0-9]{20,}(?![A-Z0-9]))['"]/gi, (match, declaration, varName, secret) => {
         const envVarName = varName.replace(/([A-Z])/g, '_$1').toUpperCase();
         environmentVariables[envVarName] = secret;
         return `${declaration} ${varName} = process.env.${envVarName};`;
       });
-
-      let finalContent = refactoredContent.replace(redactRegex, (key) => {
-        // --- FIX: Prevent redacting our own redaction string ---
-        if (key === redactionString) {
-          return key; 
+      
+      // PASS 2: Aggressive Redaction (for everything)
+      let finalContent = refactoredContent.replace(regex, (match) => {
+        if (match.includes('@')) {
+          // Always redact emails
+          redactedSecrets.add(`${match.substring(0, 15)}...`);
+          return redactionString;
+        } else {
+          // Redact API Keys, but only if they weren't already refactored
+          if (!Object.values(environmentVariables).includes(match)) {
+            redactedSecrets.add(`${match.substring(0, 15)}...`);
+            return redactionString;
+          }
+          return match; // Leave it alone, it was refactored!
         }
-        redactedKeys.add(`${key.substring(0, 15)}...`);
-        return redactionString;
       });
 
       newZip.addFile(zipEntry.entryName, Buffer.from(finalContent, "utf8"));
     });
 
-    // --- FIX: Create helper files if ANYTHING was found (refactored OR redacted) ---
-    if (Object.keys(environmentVariables).length > 0 || redactedKeys.size > 0) {
-      // Create an empty .env file if no variables were refactored, so the user knows where to add the redacted keys.
+    const hasSecrets = Object.keys(environmentVariables).length > 0 || redactedSecrets.size > 0;
+
+    if (hasSecrets) {
       const envContent = Object.keys(environmentVariables).length > 0 
         ? Object.entries(environmentVariables).map(([key, value]) => `${key}="${value}"`).join('\n')
         : `# Add your redacted keys here. For example:\n# MY_SECRET_PASSWORD="value_of_redacted_key"\n`;
@@ -115,8 +113,7 @@ exports.handler = async function (event) {
       newZip.addFile('README-SECUREAPI.md', Buffer.from(readmeContent, "utf8"));
     }
 
-  } catch (err)
-  {
+  } catch (err) {
     console.error("Error processing zip file:", err);
     return { statusCode: 400, body: JSON.stringify({ error: "Could not process the .zip file." }) };
   }
@@ -129,7 +126,7 @@ exports.handler = async function (event) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       refactoredKeys: Object.keys(environmentVariables),
-      redactedKeys: Array.from(redactedKeys),
+      redactedKeys: Array.from(redactedSecrets),
       downloadData: downloadData,
       remainingScans: MAX_SCANS_PER_MONTH - (count + 1)
     })
