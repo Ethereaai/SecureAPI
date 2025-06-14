@@ -144,8 +144,7 @@
                 <h3 class="text-xl font-semibold">Guided GitHub Deployment</h3>
             </div>
             <p class="text-gray-600 mb-4">Automatically create a secure deployment workflow (GitHub Action) for your repository.</p>
-            <button id="generateApi" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 transition">Setup Workflow (Pro)</button>
-          </div>
+            <button id="generateApi" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 transition">Setup Workflow (Pro)</button>          </div>
       </div>
       <div id="proAlertBox" class="hidden mt-6 p-4 text-sm rounded-lg flex items-center" role="alert">
         <i id="proAlertIcon" class="w-5 h-5 mr-3"></i>
@@ -317,28 +316,17 @@
     fileActionsDiv.classList.add('hidden');
 
     try {
-      // --- START OF THE FIX ---
-      // 1. Create a FileReader to read the file
       const reader = new FileReader();
-      
-      // 2. Create a Promise to handle the asynchronous file reading
       const fileReadPromise = new Promise((resolve, reject) => {
         reader.onload = () => {
-          // The result is a data URL: "data:application/zip;base64,..."
-          // We split it at the comma and take the second part (the base64 data)
           const base64String = reader.result.split(',')[1];
           resolve(base64String);
         };
         reader.onerror = reject;
       });
-
-      // 3. Start reading the file
       reader.readAsDataURL(file);
-      
-      // 4. Wait for the file to be read and get the base64 string
       const fileData = await fileReadPromise;
 
-      // 5. Send the correct JSON payload to the server
       const response = await fetch('/.netlify/functions/upload', {
         method: 'POST',
         headers: {
@@ -346,7 +334,6 @@
         },
         body: JSON.stringify({ fileData: fileData }),
       });
-      // --- END OF THE FIX ---
       
       const data = await response.json();
 
@@ -355,10 +342,10 @@
       }
       
       const successMessage = document.createElement('div');
-      successMessage.className = "text-green-600 text-left";
+      successMessage.className = "text-left";
 
       if (data.keys.length > 0) {
-        successMessage.innerHTML = `✅ Success! Your project has been refactored to use a new <strong>.env</strong> file. You have ${data.remainingScans} scans left.`;
+        successMessage.innerHTML = `<p class="text-green-600">✅ Success! Your project has been refactored to use a new <strong>.env</strong> file. You have ${data.remainingScans} scans left.</p>`;
 
         const keyList = document.createElement('div');
         keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
@@ -371,16 +358,34 @@
         successMessage.appendChild(instruction);
 
       } else {
-        successMessage.innerHTML = `✅ Scan complete! No hardcoded keys found to secure. Your project looks good! You have ${data.remainingScans} scans left.`;
+        successMessage.innerHTML = `<p class="text-green-600">✅ Scan complete! No hardcoded keys found to secure. Your project looks good! You have ${data.remainingScans} scans left.</p>`;
       }
       resultDiv.appendChild(successMessage);
 
+      // --- START: NEW CODE FOR BUTTONS ---
+      
+      // Create a container for the action buttons
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'mt-4 flex flex-wrap items-center justify-center gap-4';
+
+      // Create the Download button
       const downloadButton = document.createElement('a');
       downloadButton.href = `data:application/zip;base64,${data.downloadData}`;
       downloadButton.download = 'secured-project.zip';
-      downloadButton.className = "mt-4 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
+      downloadButton.className = "inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
       downloadButton.innerHTML = '⬇️ Download Secured Project';
-      resultDiv.appendChild(downloadButton);
+      buttonContainer.appendChild(downloadButton);
+
+      // Create the "Upload Another File" button
+      const uploadAnotherButton = document.createElement('button');
+      uploadAnotherButton.type = 'button';
+      uploadAnotherButton.className = "inline-block bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2 rounded-md text-sm font-semibold transition";
+      uploadAnotherButton.textContent = 'Scan Another File';
+      uploadAnotherButton.addEventListener('click', resetUI); // The magic happens here!
+      buttonContainer.appendChild(uploadAnotherButton);
+      
+      resultDiv.appendChild(buttonContainer);
+      // --- END: NEW CODE FOR BUTTONS ---
 
       resultDiv.classList.remove('hidden');
 
@@ -391,7 +396,7 @@
             errorDiv.textContent = err.message || 'An unknown error occurred.';
             errorDiv.classList.remove('hidden');
         }
-        fileActionsDiv.classList.remove('hidden'); // Show buttons again on error
+        fileActionsDiv.classList.remove('hidden');
     } finally {
       loading.classList.add('hidden');
     }
