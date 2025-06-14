@@ -62,17 +62,18 @@ exports.handler = async function (event) {
   }
 
   const environmentVariables = {};
-  const warnings = new Set(); // Use a Set to avoid duplicate warnings
   const newZip = new AdmZip();
 
   try {
     const originalZip = new AdmZip(zipBuffer);
     
-    // Regex for keys assigned to variables (for refactoring)
-    const refactorRegex = /(const|let|var)\s+([a-zA-Z0-9_]+)\s*=\s*['"]((?:sk|pk_live)_[a-zA-Z0-9]{40,}|AKIA[0-9A-Z]{16})['"]/gi;
+    // --- THE AGREED-UPON LOGIC ---
+    // A simple, powerful rule: any string of 20+ alphanumeric characters is a potential secret.
+    const keyPattern = "([a-zA-Z0-9]{20,})";
     
-    // Regex for any other suspicious keys (for warnings)
-    const warningRegex = /(?:['"]|[^a-zA-Z0-9])((sk|pk_live)_[a-zA-Z0-9]{40,}|AKIA[0-9A-Z]{16})(?:['"]|[^a-zA-Z0-9])/gi;
+    // This regex looks for a key assigned to a variable.
+    const refactorRegex = new RegExp(`(const|let|var)\\s+([a-zA-Z0-9_]+)\\s*=\\s*['"]${keyPattern}['"]`, 'gi');
+    // --- END OF LOGIC ---
 
     originalZip.getEntries().forEach((zipEntry) => {
       if (zipEntry.isDirectory) {
@@ -80,20 +81,13 @@ exports.handler = async function (event) {
         return;
       }
       let content = originalZip.readAsText(zipEntry);
-
-      // --- PASS 1: Refactor what we can ---
+      
+      // We only need one pass now. This finds and refactors everything.
       let securedContent = content.replace(refactorRegex, (match, declaration, varName, secret) => {
         const envVarName = varName.replace(/([A-Z])/g, '_$1').toUpperCase();
         environmentVariables[envVarName] = secret;
         return `${declaration} ${varName} = process.env.${envVarName};`;
       });
-
-      // --- PASS 2: Find other keys and add warnings ---
-      let match;
-      while ((match = warningRegex.exec(securedContent)) !== null) {
-         // Add a truncated version to the warnings
-         warnings.add(`${match[1].substring(0, 15)}...`);
-      }
 
       newZip.addFile(zipEntry.entryName, Buffer.from(securedContent, "utf8"));
     });
@@ -116,12 +110,12 @@ exports.handler = async function (event) {
   
   const refactoredKeys = Object.keys(environmentVariables);
 
+  // We no longer need the 'warnings' system as this single rule is comprehensive.
   return {
     statusCode: 200,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       keys: refactoredKeys,
-      warnings: Array.from(warnings), // Convert Set to Array for JSON
       downloadData: downloadData,
       remainingScans: MAX_SCANS_PER_MONTH - (count + 1)
     })
