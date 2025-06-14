@@ -74,16 +74,14 @@ exports.handler = async function (event) {
   try {
     const originalZip = new AdmZip(zipBuffer);
     
-    // --- THE FIX IS HERE: Include hyphen in the key pattern ---
-    const keyPattern = "([a-zA-Z0-9_-]{20,})"; // Added hyphen to the character class
-    // --- END OF FIX ---
-    
+    const keyPattern = "([a-zA-Z0-9_-]{20,})";
     const refactorRegex = new RegExp(`(const|let|var)\\s+([a-zA-Z0-9_]+)\\s*=\\s*['"]${keyPattern}['"]`, 'gi');
     const redactRegex = new RegExp(keyPattern, 'g');
+    const redactionString = '***REDACTED_BY_SECUREAPI***';
 
     originalZip.getEntries().forEach((zipEntry) => {
       if (zipEntry.isDirectory) {
-        newZip.addFile(zipEntry.entryName, Buffer.from(0), '', zipEntry.attr); // Corrected: Buffer.alloc(0) or Buffer.from('')
+        newZip.addFile(zipEntry.entryName, Buffer.alloc(0), '', zipEntry.attr);
         return;
       }
       let content = originalZip.readAsText(zipEntry);
@@ -95,28 +93,30 @@ exports.handler = async function (event) {
       });
 
       let finalContent = refactoredContent.replace(redactRegex, (key) => {
-        // Ensure we don't try to redact something that was already handled by refactoring
-        // This check is a bit simplistic but helps avoid double-processing in some edge cases.
-        // A more robust way would be to track exact positions, but this is a good heuristic.
-        if (Object.values(environmentVariables).includes(key)) {
-            return key; // If it was refactored, leave it as is (it's now process.env.VAR)
+        // --- FIX: Prevent redacting our own redaction string ---
+        if (key === redactionString) {
+          return key; 
         }
         redactedKeys.add(`${key.substring(0, 15)}...`);
-        return `***REDACTED_BY_SECUREAPI***`;
+        return redactionString;
       });
 
       newZip.addFile(zipEntry.entryName, Buffer.from(finalContent, "utf8"));
     });
 
-    if (Object.keys(environmentVariables).length > 0) {
-      const envContent = Object.entries(environmentVariables)
-        .map(([key, value]) => `${key}="${value}"`)
-        .join('\n');
+    // --- FIX: Create helper files if ANYTHING was found (refactored OR redacted) ---
+    if (Object.keys(environmentVariables).length > 0 || redactedKeys.size > 0) {
+      // Create an empty .env file if no variables were refactored, so the user knows where to add the redacted keys.
+      const envContent = Object.keys(environmentVariables).length > 0 
+        ? Object.entries(environmentVariables).map(([key, value]) => `${key}="${value}"`).join('\n')
+        : `# Add your redacted keys here. For example:\n# MY_SECRET_PASSWORD="value_of_redacted_key"\n`;
+        
       newZip.addFile('.env', Buffer.from(envContent, "utf8"));
       newZip.addFile('README-SECUREAPI.md', Buffer.from(readmeContent, "utf8"));
     }
 
-  } catch (err) {
+  } catch (err)
+  {
     console.error("Error processing zip file:", err);
     return { statusCode: 400, body: JSON.stringify({ error: "Could not process the .zip file." }) };
   }
