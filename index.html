@@ -266,18 +266,16 @@
   // Initialize Lucide icons
   lucide.createIcons();
 
-  // --- ELEMENT SELECTORS ---
   const uploadForm = document.getElementById('uploadForm');
   const fileInput = document.getElementById('fileInput');
   const loading = document.getElementById('loading');
   const resultDiv = document.getElementById('result');
-  const errorDiv = document.getElementById('error');
+  const errorDiv = document.getElementById('error'); // We still need this for non-pro errors
   const proAlertBox = document.getElementById('proAlertBox');
   const proAlertIcon = document.getElementById('proAlertIcon');
   const proAlertMessage = document.getElementById('proAlertMessage');
 
-  // --- HELPER FUNCTION FOR PROFESSIONAL ALERTS ---
-  function showProAlert(message, type = 'info') {
+  function showProAlert(message, type = 'error') {
     proAlertBox.classList.remove('bg-red-100', 'text-red-700', 'bg-blue-100', 'text-blue-700');
     if (type === 'error') {
       proAlertIcon.setAttribute('data-lucide', 'shield-x');
@@ -297,9 +295,7 @@
     errorDiv.classList.add('hidden');
   }
 
-  // --- EVENT LISTENERS ---
-
-  // Main Uploader Functionality
+  // --- Main Uploader Functionality ---
   uploadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideAlerts();
@@ -312,46 +308,63 @@
     try {
       const response = await fetch('/.netlify/functions/upload', { method: 'POST', body: fileInput.files[0] });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
-      // ... (The rest of your working success logic here) ...
+      
+      // THIS IS THE KEY CHANGE. We check for the specific "limit reached" error.
+      if (!response.ok) {
+        // If it's the rate limit error, show the nice Pro alert.
+        if (response.status === 429) {
+          showProAlert(data.error || 'You have reached your scan limit.', 'error');
+        } else { // For any other error (like a corrupt file)
+          errorDiv.textContent = data.error || 'An unknown error occurred.';
+          errorDiv.classList.remove('hidden');
+        }
+        return; // Stop execution
+      }
+      
+      // --- This is the success path logic ---
+      const successMessage = document.createElement('div');
+      successMessage.className = "text-green-600 text-left";
+      if(data.keys.length > 0) {
+        successMessage.innerHTML = `✅ Scan complete! Found and secured ${data.keys.length} potential key(s). You have ${data.remainingScans} scans left.`;
+        const keyList = document.createElement('div');
+        keyList.className = 'mt-2 font-mono text-sm bg-green-50 p-3 rounded-md text-gray-700';
+        keyList.innerHTML = '<strong>Found Keys:</strong><br>' + data.keys.join('<br>');
+        successMessage.appendChild(keyList);
+      } else {
+        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. You have ${data.remainingScans} scans left.`;
+      }
+      resultDiv.appendChild(successMessage);
+      const downloadButton = document.createElement('a');
+      downloadButton.href = `data:application/zip;base64,${data.downloadData}`;
+      downloadButton.download = 'secured-project.zip';
+      downloadButton.className = "mt-4 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition";
+      downloadButton.innerHTML = '⬇️ Download Secured Project';
+      resultDiv.appendChild(downloadButton);
       resultDiv.classList.remove('hidden');
+      
     } catch (err) {
-      errorDiv.textContent = err.message;
+      // This is now a fallback for network errors
+      errorDiv.textContent = 'A network error occurred. Please try again.';
       errorDiv.classList.remove('hidden');
     } finally {
       loading.classList.add('hidden');
     }
   });
 
-  // --- THE KEY CHANGE IS HERE ---
-  // Both Pro buttons now do the exact same thing.
-  
+  // --- Pro Feature Listeners ---
   document.getElementById('getBoilerplate').addEventListener('click', () => {
-      hideAlerts();
-      showProAlert('This feature requires SecureAPI Pro. Please upgrade to continue.', 'info');
-  });
-
-  // --- Pro Feature: Generate Workflow Button ---
-document.getElementById('generateApi').addEventListener('click', () => {
-    // This now behaves exactly like the 'getBoilerplate' button.
-    // The broken 'async' and 'fetch' code is gone, but the function file is safe.
     hideAlerts();
     showProAlert('This feature requires SecureAPI Pro. Please upgrade to continue.', 'info');
-});
-
-  // --- Other Button Listeners ---
-  document.getElementById('clearFile').addEventListener('click', () => {
-      fileInput.value = '';
-      hideAlerts();
+  });
+  document.getElementById('generateApi').addEventListener('click', () => {
+    hideAlerts();
+    showProAlert('This feature requires SecureAPI Pro. Please upgrade to continue.', 'info');
   });
 
-  document.getElementById('upgradePro').addEventListener('click', () => {
-      alert('💳 Redirecting to checkout... In a real app, this would open Stripe checkout.');
-  });
-  
-  document.getElementById('freeSignup').addEventListener('click', () => {
-      document.querySelector('#upload').scrollIntoView({ behavior: 'smooth' });
-  });
+  // --- Other Listeners ---
+  document.getElementById('clearFile').addEventListener('click', () => { hideAlerts(); fileInput.value = ''; });
+  document.getElementById('upgradePro').addEventListener('click', () => { alert('💳 Redirecting to checkout...'); });
+  document.getElementById('freeSignup').addEventListener('click', () => { document.querySelector('#upload').scrollIntoView({ behavior: 'smooth' }); });
 </script>
 </body>
 </html>
