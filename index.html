@@ -290,7 +290,7 @@
         body: fileInput.files[0],
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
+      if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
       
       const successMessage = document.createElement('div');
       successMessage.className = "text-green-600 text-left";
@@ -340,13 +340,16 @@
           body: JSON.stringify(projectDetails)
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        if (!response.ok) throw new Error(data.error || "An unknown error occurred.");
+
+        // This line is now CORRECTED to properly display the code
+        const codeToDisplay = data.ymlContent.replace(/</g, "<").replace(/>/g, ">");
 
         resultDiv.innerHTML = `
           <div class="text-left">
             <h4 class="font-semibold text-lg mb-2">✅ Generated GitHub Workflow!</h4>
             <p class="text-sm text-gray-600 mb-3">Copy this code into a new file in your project at <code class="bg-gray-200 text-sm p-1 rounded">.github/workflows/deploy.yml</code></p>
-            <pre class="bg-gray-800 text-white p-4 rounded-md text-sm overflow-x-auto"><code>${data.ymlContent.replace(/</g, "<").replace(/>/g, ">")}</code></pre>
+            <pre class="bg-gray-800 text-white p-4 rounded-md text-sm overflow-x-auto"><code>${codeToDisplay}</code></pre>
           </div>
         `;
         resultDiv.classList.remove('hidden');
@@ -370,16 +373,13 @@
       genError.classList.remove('hidden');
   });
 
-  // This brings back your Stripe popup alert
   document.getElementById('upgradePro').addEventListener('click', () => {
       alert('💳 Redirecting to checkout... In a real app, this would open Stripe checkout.');
   });
   
-  // This makes the pricing "Get Started" button scroll to the upload section
   document.getElementById('freeSignup').addEventListener('click', () => {
       document.querySelector('#upload').scrollIntoView({ behavior: 'smooth' });
   });
-
 </script>
 </body>
 </html>

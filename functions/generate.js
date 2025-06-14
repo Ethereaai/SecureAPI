@@ -1,18 +1,19 @@
 // functions/generate.js
 
-import OpenAI from 'openai';
+// Use 'require' to be consistent with your other function
+const OpenAI = require('openai');
 
 // Initialize the OpenAI client to talk to OpenRouter
 const api = new OpenAI({
   apiKey: process.env.FREE_MODEL_API_KEY,
   baseURL: process.env.FREE_MODEL_BASE_URL,
-  // OpenRouter recommends these headers to identify your app
   defaultHeaders: {
     'HTTP-Referer': 'https://secureapi.online', // Your site URL
     'X-Title': 'SecureAPI', // Your project's name
   },
 });
 
+// Use 'exports.handler' to be consistent
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
@@ -43,15 +44,12 @@ exports.handler = async function (event) {
 
   try {
     const completion = await api.chat.completions.create({
-      // We use the specific model identifier from your list
       model: 'mistralai/devstral-small',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
     });
 
     const generatedYml = completion.choices[0].message.content;
-
-    // Clean up the response to ensure it's just the code
     const cleanedYml = generatedYml.replace(/```yaml\n|```/g, '').trim();
 
     return {
