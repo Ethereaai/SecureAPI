@@ -36,13 +36,19 @@ exports.handler = async function (event) {
 
   let zipBuffer;
   try {
+    // Log for debugging
+    console.log('Request body type:', typeof event.body);
+    console.log('Request headers:', event.headers);
+    
     const requestBody = JSON.parse(event.body);
     if (!requestBody.fileData) {
       return { statusCode: 400, body: JSON.stringify({ error: "No file data in request." }) };
     }
     zipBuffer = Buffer.from(requestBody.fileData, "base64");
   } catch (parseError) {
-    return { statusCode: 400, body: JSON.stringify({ error: "Invalid request format." }) };
+    console.error('Parse error:', parseError);
+    console.log('Raw body:', event.body.substring(0, 200)); // First 200 chars
+    return { statusCode: 400, body: JSON.stringify({ error: `Invalid request format: ${parseError.message}` }) };
   }
   const detectedKeys = [];
   const newZip = new AdmZip();
