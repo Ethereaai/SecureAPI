@@ -1,60 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>SecureAPI - Go From Code to Live AI App, Securely</title>
+
+  <!-- Styles & Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    html {
-      scroll-behavior: smooth;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .gradient-bg {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-    }
-    .coming-soon-box {
-      background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 10px, #e5e7eb 10px, #e5e7eb 20px);
-    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'Inter',sans-serif; }
+    .gradient-bg   { background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#d946ef 100%); }
+    .coming-soon-box { background:repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6 10px,#e5e7eb 10px,#e5e7eb 20px); }
   </style>
 </head>
-<body class="font-inter bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800">
 
-  <!-- HEADER SECTION -->
-  <header class="sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-6">
-          <div class="flex justify-between items-center h-16">
-              <a href="#" class="flex items-center">
-                  <i data-lucide="shield-check" class="w-7 h-7 text-indigo-600 mr-2"></i>
-                  <span class="font-bold text-xl text-gray-800">SecureAPI</span>
-              </a>
-              <nav class="hidden md:flex items-center space-x-6">
-                  <a href="#pro-features" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Features</a>
-                  <a href="#guides" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Guides</a>
-                  <a href="#pricing" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Pricing</a>
-              </nav>
-              <a href="#upload" class="hidden md:inline-block bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-                  Get Started
-              </a>
-          </div>
-      </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="gradient-bg text-white py-24 px-6 text-center">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">Go From Code to Live AI App, Instantly</h1>
-      <p class="text-lg md:text-xl mb-8">Stuck with an amazing AI project but terrified of leaking your OpenAI key? SecureAPI scans your code, magically fixes security issues, and gets you ready to deploy in minutes. No complex setup, just results.</p>
-      <a href="#upload" class="inline-block bg-white text-indigo-600 font-semibold px-8 py-3 rounded-lg shadow-lg hover:bg-gray-100 transition text-lg">Make My App Launch-Ready</a>
+<!-- ─── Header ────────────────────────────────────────────── -->
+<header class="sticky top-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-200">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex justify-between items-center h-16">
+      <a href="#" class="flex items-center">
+        <i data-lucide="shield-check" class="w-7 h-7 text-indigo-600 mr-2"></i>
+        <span class="font-bold text-xl">SecureAPI</span>
+      </a>
+      <nav class="hidden md:flex items-center space-x-6">
+        <a href="#pro-features" class="text-sm font-medium text-gray-600 hover:text-indigo-600">Features</a>
+        <a href="#guides"       class="text-sm font-medium text-gray-600 hover:text-indigo-600">Guides</a>
+        <a href="#pricing"      class="text-sm font-medium text-gray-600 hover:text-indigo-600">Pricing</a>
+      </nav>
+      <a href="#upload" class="hidden md:inline-block bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">Get Started</a>
     </div>
-  </section>
+  </div>
+</header>
 
-  <!-- How It Works Section -->
-  <section class="py-20 px-6 bg-white">
+<!-- ─── Hero ──────────────────────────────────────────────── -->
+<section class="gradient-bg text-white py-24 px-6 text-center">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Go From Code to Live AI App, Instantly</h1>
+    <p class="text-lg md:text-xl mb-8">Stuck with an amazing AI project but terrified of leaking your OpenAI key? SecureAPI scans your code, magically fixes security issues, and gets you ready to deploy in minutes.</p>
+    <a href="#upload" class="inline-block bg-white text-indigo-600 font-semibold px-8 py-3 rounded-lg shadow-lg hover:bg-gray-100 text-lg">Make My App Launch-Ready</a>
+  </div>
+</section>
+
+<!-- HOW IT WORKS SECTION -->
+<section class="py-20 px-6 bg-white">
     <div class="max-w-5xl mx-auto text-center">
       <h2 class="text-3xl font-bold mb-12">Your 3-Step Launchpad</h2>
       <div class="grid md:grid-cols-3 gap-10">
@@ -81,51 +74,47 @@
         </div>
       </div>
     </div>
-  </section>
-  
-  <!-- Upload Section -->
-  <section id="upload" class="py-20 px-6 bg-gray-50">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-3xl font-bold mb-6">Let's Get Your Project Ready</h2>
-      <div class="border border-gray-200 p-8 rounded-xl bg-white shadow-sm">
-        <div id="uploadBox">
-            <div class="mb-4" id="file-upload-area">
-                <input type="file" id="fileInput" name="project" accept=".zip" class="hidden" />
-                <button id="chooseFileBtn" class="bg-indigo-50 text-indigo-700 font-semibold py-2 px-4 rounded-full hover:bg-indigo-100">
-                    Choisir un fichier
-                </button>
-                <span id="fileName" class="ml-4 text-gray-600"></span>
-            </div>
-            
-            <div id="file-actions" class="hidden">
-                 <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-md font-semibold">Scan & Secure</button>
-                 <button type="button" id="clearFile" class="ml-2 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-md font-medium">Remove</button>
-            </div>
-        </div>
-          <div id="loading" class="mt-4 hidden">🔄 Scanning...</div>
-          <div id="result" class="mt-4 text-sm hidden"></div>
-          <div id="error" class="mt-4 text-sm text-red-600"></div>
-      </div>
-    </div>
-  </section>
+</section>
 
-  <!-- LAUNCH & ENHANCE AFFILIATE SECTION -->
-  <section class="py-20 bg-white">
+<!-- ─── Upload Section ─────────────────────────────────────── -->
+<section id="upload" class="py-20 px-6 bg-gray-50">
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="text-3xl font-bold mb-6">Let's Get Your Project Ready</h2>
+    <div class="border border-gray-200 p-8 rounded-xl bg-white shadow-sm">
+      <div id="uploadBox">
+        <div class="mb-4" id="file-upload-area">
+          <input type="file" id="fileInput" name="project" accept=".zip" class="hidden" />
+          <button id="chooseFileBtn" class="bg-indigo-50 text-indigo-700 font-semibold py-2 px-4 rounded-full hover:bg-indigo-100">Choose file</button>
+          <span id="fileName" class="ml-4 text-gray-600"></span>
+        </div>
+        <div id="file-actions" class="hidden">
+          <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-md font-semibold">Scan & Secure</button>
+          <button type="button" id="clearFile" class="ml-2 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-md font-medium">Remove</button>
+        </div>
+      </div>
+      <div id="loading" class="mt-4 hidden">🔄 Scanning…</div>
+      <div id="result"  class="mt-4 text-sm hidden"></div>
+      <div id="error"   class="mt-4 text-sm text-red-600"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LAUNCH & ENHANCE AFFILIATE SECTION -->
+<section class="py-20 bg-white">
       <div class="max-w-6xl mx-auto px-6 text-center">
           <h3 class="text-3xl font-bold text-gray-800 mb-4">The Complete AI App Starter Kit</h3>
           <p class="text-gray-600 mb-10">Everything you need to deploy, manage, and scale your first AI application, recommended by us.</p>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <!-- Affiliate Links Here -->
               <a href="#" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500"><img class="h-10 mb-3" src="https://www.svgrepo.com/show/354110/netlify-icon.svg" alt="Netlify"><span class="font-semibold text-gray-700">Netlify</span></a>
               <a href="#" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500"><img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/97495488?s=200&v=4" alt="Clerk"><span class="font-semibold text-gray-700">Clerk</span></a>
               <a href="#" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500"><img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/124233958?s=200&v=4" alt="Resend"><span class="font-semibold text-gray-700">Resend</span></a>
               <a href="#" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500"><img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/114283372?s=200&v=4" alt="Helicone"><span class="font-semibold text-gray-700">Helicone</span></a>
           </div>
       </div>
-  </section>
+</section>
 
-  <!-- Pro Features Upsell Section -->
-  <section id="pro-features" class="py-20 px-6 bg-gray-50">
+<!-- Pro Features Upsell Section -->
+<section id="pro-features" class="py-20 px-6 bg-gray-50">
     <div class="max-w-4xl mx-auto text-center">
       <h2 class="text-3xl font-bold">Build Even Faster with SecureAPI Pro</h2>
       <p class="mt-2 mb-8 text-gray-600">Solve common beginner roadblocks with our powerful Pro toolkit.</p>
@@ -146,15 +135,11 @@
             <p class="text-gray-600 mb-4">Automatically create a secure deployment workflow (GitHub Action) for your repository.</p>
             <button id="generateApi" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 transition">Setup Workflow (Pro)</button>          </div>
       </div>
-      <div id="proAlertBox" class="hidden mt-6 p-4 text-sm rounded-lg flex items-center" role="alert">
-        <i id="proAlertIcon" class="w-5 h-5 mr-3"></i>
-        <span id="proAlertMessage"></span>
-      </div>
     </div>
-  </section>
+</section>
 
-  <!-- Pricing Section -->
-  <section id="pricing" class="py-20 px-6 bg-white">
+<!-- Pricing Section -->
+<section id="pricing" class="py-20 px-6 bg-white">
     <div class="max-w-6xl mx-auto">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold">Simple, Fair Pricing</h2>
@@ -191,32 +176,45 @@
         </div>
       </div>
     </div>
+</section>
+
+ <!-- LAUNCH & ENHANCE AFFILIATE SECTION (REPLACES DEPLOYMENT SECTION) -->
+  <section class="py-20 bg-white">
+      <div class="max-w-6xl mx-auto px-6 text-center">
+          <h3 class="text-3xl font-bold text-gray-800 mb-4">The Complete AI App Starter Kit</h3>
+          <p class="text-gray-600 mb-10">Everything you need to deploy, manage, and scale your first AI application, recommended by us.</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <a href="#" title="Visit Netlify" class="relative group flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <div class="absolute top-0 right-0 -mt-2 -mr-2"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Top Payout</span></div>
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/354110/netlify-icon.svg" alt="Netlify"><span class="font-semibold text-gray-700">Netlify</span><span class="text-xs text-gray-500 mt-1">30% Lifetime Commission</span>
+              </a>
+              <a href="#" title="Visit Clerk" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/97495488?s=200&v=4" alt="Clerk"><span class="font-semibold text-gray-700">Clerk</span><span class="text-xs text-gray-500 mt-1">Add User Logins in Minutes</span>
+              </a>
+              <a href="#" title="Visit Resend" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/124233958?s=200&v=4" alt="Resend"><span class="font-semibold text-gray-700">Resend</span><span class="text-xs text-gray-500 mt-1">Reliable Email for Your App</span>
+              </a>
+              <a href="#" title="Visit Helicone" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://avatars.githubusercontent.com/u/114283372?s=200&v=4" alt="Helicone"><span class="font-semibold text-gray-700">Helicone</span><span class="text-xs text-gray-500 mt-1">Monitor & Cache LLMs</span>
+              </a>
+              <a href="#" title="Visit Vercel" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/354512/vercel-icon.svg" alt="Vercel"><span class="font-semibold text-gray-700">Vercel</span><span class="text-xs text-gray-500 mt-1">Great for Next.js</span>
+              </a>
+              <a href="#" title="Visit Apify" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/373432/apify.svg" alt="Apify"><span class="font-semibold text-gray-700">Apify</span><span class="text-xs text-gray-500 mt-1">For Web Scraping & Data</span>
+              </a>
+              <a href="#" title="Visit Supabase" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/374111/supabase.svg" alt="Supabase"><span class="font-semibold text-gray-700">Supabase</span><span class="text-xs text-gray-500 mt-1">Backend & Database</span>
+              </a>
+              <a href="#" title="Visit Railway" class="flex flex-col items-center justify-center p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all duration-200">
+                  <img class="h-10 mb-3" src="https://www.svgrepo.com/show/374026/railway.svg" alt="Railway"><span class="font-semibold text-gray-700">Railway</span><span class="text-xs text-gray-500 mt-1">Flexible Deployments</span>
+              </a>
+          </div>
+      </div>
   </section>
 
-  <!-- Educational Affiliate Section -->
-  <section id="guides" class="py-20 px-6 bg-gray-50">
-    <div class="max-w-5xl mx-auto text-center">
-        <h3 class="text-3xl font-bold text-gray-800 mb-4">Confused? Let Us Help.</h3>
-        <p class="text-gray-600 mb-10">Check out our guides to help you on your journey from idea to live application.</p>
-        <div class="grid md:grid-cols-3 gap-6">
-            <a href="#" class="block p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all text-left">
-                <h4 class="font-semibold text-gray-900 mb-2">Guide: Deploying to Vercel</h4>
-                <p class="text-sm text-gray-600">A step-by-step tutorial to get your secured app live in under 5 minutes.</p>
-            </a>
-            <a href="#" class="block p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all text-left">
-                <h4 class="font-semibold text-gray-900 mb-2">Top 5 Courses for AI Devs</h4>
-                <p class="text-sm text-gray-600">Our curated list of the best online courses to level up your skills.</p>
-            </a>
-            <a href="#" class="block p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg hover:border-indigo-500 transition-all text-left">
-                <h4 class="font-semibold text-gray-900 mb-2">What is a .env file?</h4>
-                <p class="text-sm text-gray-600">A simple explanation of why we use .env files and how they keep your keys safe.</p>
-            </a>
-        </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="bg-white pt-10">
+<!-- Footer -->
+<footer class="bg-white pt-10">
     <div class="max-w-4xl mx-auto px-6 mb-10">
       <a href="#" target="_blank" rel="noopener sponsored" class="block p-6 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all group">
         <div class="flex flex-col md:flex-row items-center justify-between">
@@ -236,9 +234,10 @@
     <div class="py-10 text-center text-sm text-gray-500 border-t">
       © 2025 SecureAPI. All rights reserved.
     </div>
-  </footer>
+</footer>
 
-  <script>
+<!-- ─── Front-end Script ───────────────────────────────────── -->
+<script>
   // Initialize Lucide icons
   lucide.createIcons();
 
@@ -251,26 +250,9 @@
   const loading = document.getElementById('loading');
   const resultDiv = document.getElementById('result');
   const errorDiv = document.getElementById('error');
-  const proAlertBox = document.getElementById('proAlertBox');
-  const proAlertIcon = document.getElementById('proAlertIcon');
-  const proAlertMessage = document.getElementById('proAlertMessage');
   const clearFileBtn = document.getElementById('clearFile');
 
   // --- HELPER FUNCTIONS ---
-  function showProAlert(message, type = 'error') {
-    proAlertBox.classList.remove('bg-red-100', 'text-red-700', 'bg-blue-100', 'text-blue-700');
-    if (type === 'error') {
-      proAlertIcon.setAttribute('data-lucide', 'shield-x');
-      proAlertBox.classList.add('bg-red-100', 'text-red-700');
-    } else { // 'info' for locked features
-      proAlertIcon.setAttribute('data-lucide', 'lock');
-      proAlertBox.classList.add('bg-blue-100', 'text-blue-700');
-    }
-    proAlertMessage.textContent = message;
-    lucide.createIcons();
-    proAlertBox.classList.remove('hidden');
-  }
-  
   function resetUI() {
     fileInput.value = '';
     fileNameSpan.textContent = '';
@@ -280,7 +262,6 @@
     resultDiv.innerHTML = '';
     errorDiv.classList.add('hidden');
     errorDiv.textContent = '';
-    proAlertBox.classList.add('hidden');
     loading.classList.add('hidden');
   }
 
@@ -303,8 +284,8 @@
   submitBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     resultDiv.classList.add('hidden');
+    resultDiv.innerHTML = '';
     errorDiv.classList.add('hidden');
-    proAlertBox.classList.add('hidden');
     
     const file = fileInput.files[0];
     if (!file) {
@@ -341,4 +322,72 @@
           throw new Error(data.error || `Server responded with status ${response.status}`);
       }
       
-      const resultContainer
+      const successBox = document.createElement('div');
+      successBox.className = 'text-left space-y-4';
+
+      if (data.refactoredKeys && data.refactoredKeys.length > 0) {
+        const ok = document.createElement('div');
+        ok.className = 'p-3 bg-green-50 text-green-800 rounded-md';
+        ok.innerHTML = `✅ <strong>Success!</strong> Refactored ${data.refactoredKeys.length} key(s) into a new <strong>.env</strong> file. See the README for next steps.`;
+        successBox.appendChild(ok);
+      }
+
+      if (data.redactedKeys && data.redactedKeys.length > 0) {
+        const warn = document.createElement('div');
+        warn.className = 'p-3 bg-yellow-50 text-yellow-800 rounded-md';
+        warn.innerHTML = `⚠️ <strong>Warning:</strong> Found and redacted ${data.redactedKeys.length} other potential secret(s) that require manual review:<div class="font-mono text-xs mt-2">${data.redactedKeys.join('<br>')}</div>`;
+        successBox.appendChild(warn);
+      }
+
+      if ((!data.refactoredKeys || !data.refactoredKeys.length) && (!data.redactedKeys || !data.redactedKeys.length)) {
+        successBox.innerHTML = `<div class="p-3 bg-green-50 text-green-800 rounded-md">✅ No hard-coded keys found. Your project looks good! You have ${data.remainingScans} scans left.</div>`;
+      }
+
+      resultDiv.appendChild(successBox);
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'mt-4 flex flex-wrap items-center justify-center gap-4';
+
+      const dl = document.createElement('a');
+      dl.href        = `data:application/zip;base64,${data.downloadData}`;
+      dl.download    = 'secured-project.zip';
+      dl.className   = 'inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition';
+      dl.textContent = '⬇️ Download Secured Project';
+      buttonContainer.appendChild(dl);
+
+      const uploadAnotherButton = document.createElement('button');
+      uploadAnotherButton.type = 'button';
+      uploadAnotherButton.className = "inline-block bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2 rounded-md text-sm font-semibold transition";
+      uploadAnotherButton.textContent = 'Scan Another File';
+      uploadAnotherButton.addEventListener('click', resetUI);
+      buttonContainer.appendChild(uploadAnotherButton);
+      
+      resultDiv.appendChild(buttonContainer);
+      resultDiv.classList.remove('hidden');
+      
+    } catch (err) {
+        errorDiv.textContent = err.message || 'An unknown error occurred.';
+        errorDiv.classList.remove('hidden');
+        fileActionsDiv.classList.remove('hidden');
+    } finally {
+      loading.classList.add('hidden');
+    }
+  });
+
+  // Event listeners for pro features
+  document.getElementById('getBoilerplate').addEventListener('click', () => {
+    alert('This is a Pro feature.');
+  });
+  document.getElementById('generateApi').addEventListener('click', () => {
+    alert('This is a Pro feature.');
+  });
+  document.getElementById('upgradePro').addEventListener('click', () => {
+    alert('Redirecting to checkout...');
+  });
+  document.getElementById('freeSignup').addEventListener('click', () => {
+    document.querySelector('#upload').scrollIntoView({ behavior: 'smooth' });
+  });
+
+</script>
+</body>
+</html>
