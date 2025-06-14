@@ -178,7 +178,7 @@
         <div class="border border-gray-200 rounded-xl p-8 flex flex-col hover:shadow-md transition">
             <h3 class="text-xl font-semibold mb-1">Free</h3>
             <p class="text-gray-600 mb-6">For getting your first projects live.</p>
-            <div class="flex items-baseline mb-8"><span class="text-4xl font-bold">$0</span><span class="ml-1 text-gray-500">/forever</span></div>
+            <div class="flex items-baseline mb-8"><span class="text-4xl font-bold">€0</span><span class="ml-1 text-gray-500">/forever</span></div>
             <ul class="space-y-3 mb-8 text-gray-600">
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>3 scans per month</li>
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Secure code downloads</li>
@@ -188,7 +188,7 @@
             <button id="freeSignup" class="mt-auto w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-md transition">Get Started</button>
         </div>
         <div class="border-2 border-indigo-500 rounded-xl p-8 flex flex-col shadow-lg transform hover:scale-105">
-          <div class="text-center"><h3 class="text-2xl font-semibold mb-1">Pro</h3><p class="text-indigo-600 mb-6">For building and launching faster.</p><div class="flex items-baseline justify-center mb-8"><span class="text-4xl font-bold">$9</span><span class="ml-1 text-gray-500">/month</span></div></div>
+          <div class="text-center"><h3 class="text-2xl font-semibold mb-1">Pro</h3><p class="text-indigo-600 mb-6">For building and launching faster.</p><div class="flex items-baseline justify-center mb-8"><span class="text-4xl font-bold">€9</span><span class="ml-1 text-gray-500">/month</span></div></div>
           <ul class="space-y-3 mb-8 text-gray-600">
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Unlimited scans</li>
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>GitHub integration</li>
@@ -259,82 +259,85 @@
 </footer>
 
   <script>
-    // Initialize Lucide icons
-    lucide.createIcons();
-    const apiKeyPatterns = ['STRIPE_KEY', 'SENDGRID_KEY', 'AWS_ACCESS_KEY', 'FIREBASE_KEY', 'OPENAI_API_KEY'];
-    document.getElementById('freeSignup').addEventListener('click', () => {
-      alert('🎉 Welcome to SecureAPI Free! In a real app, this would redirect to signup.');
-    });
-    document.getElementById('upgradePro').addEventListener('click', () => {
-      alert('💳 Redirecting to checkout... In a real app, this would open Stripe checkout.');
-    });
-    document.getElementById('clearFile').addEventListener('click', () => {
-      const fileInput = document.getElementById('fileInput');
-      fileInput.value = '';
-      document.getElementById('result').classList.add('hidden');
-      document.getElementById('error').classList.add('hidden');
-    });
-    document.getElementById('uploadForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById('fileInput');
-      const loading = document.getElementById('loading');
-      const result = document.getElementById('result');
-      const error = document.getElementById('error');
-      result.classList.add('hidden');
-      error.classList.add('hidden');
-      result.innerHTML = ''; 
-      if (!fileInput.files[0]) {
-        error.textContent = 'Please select a file to upload.';
-        error.classList.remove('hidden');
-        return;
+  // Initialize Lucide icons
+  lucide.createIcons();
+
+  const uploadForm = document.getElementById('uploadForm');
+  const fileInput = document.getElementById('fileInput');
+  const loading = document.getElementById('loading');
+  const resultDiv = document.getElementById('result');
+  const errorDiv = document.getElementById('error');
+
+  // A helper function to create a real download link from base64 data
+  function createDownloadLink(filename, base64Data) {
+      const link = document.createElement('a');
+      link.href = `data:application/zip;base64,${base64Data}`;
+      link.download = filename;
+      link.className = "mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition";
+      link.innerHTML = '⬇️ Download Secured Project';
+      return link;
+  }
+
+  uploadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    resultDiv.classList.add('hidden');
+    errorDiv.classList.add('hidden');
+    
+    if (!fileInput.files[0]) {
+      errorDiv.textContent = 'Please select a file to upload.';
+      errorDiv.classList.remove('hidden');
+      return;
+    }
+
+    loading.classList.remove('hidden');
+
+    const formData = new FormData();
+    formData.append('project', fileInput.files[0]);
+
+    try {
+      // We call our serverless function at the correct endpoint
+      const response = await fetch('/.netlify/functions/upload', {
+        method: 'POST',
+        body: fileInput.files[0], // Sending the file directly is simpler for Netlify Functions
+      });
+      
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'An unknown error occurred.');
       }
-      if (!fileInput.files[0].name.endsWith('.zip')) {
-        error.textContent = 'Please upload a .zip file.';
-        error.classList.remove('hidden');
-        return;
+      
+      // Clear previous content
+      resultDiv.innerHTML = ''; 
+
+      // Build the success message
+      const successMessage = document.createElement('div');
+      successMessage.className = "text-green-600";
+      if(data.keys.length > 0) {
+        successMessage.innerHTML = `✅ Scan complete! Found and secured ${data.keys.length} key(s). You have ${data.remainingScans} scans left.`;
+      } else {
+        successMessage.innerHTML = `✅ Scan complete! No exposed keys found. You have ${data.remainingScans} scans left.`;
       }
-      loading.classList.remove('hidden');
-      setTimeout(() => {
-        loading.classList.add('hidden');
-        const foundKeys = apiKeyPatterns.slice(0, Math.floor(Math.random() * 3) + 1);
-        if (foundKeys.length > 0) {
-          result.innerHTML = `
-            <div class="text-green-600">
-              ✅ Scan complete! Found and secured ${foundKeys.length} API key${foundKeys.length > 1 ? 's' : ''}:
-              <div class="mt-2 font-mono text-sm bg-green-50 p-2 rounded">${foundKeys.join(', ')}</div>
-              <button onclick="downloadSecuredProject()" class="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium transition">⬇️ Download Secured Project</button>
-            </div>`;
-        } else {
-          result.innerHTML = `<div class="text-blue-600">✅ Scan complete! No exposed API keys found. Your project is already secure!</div>`;
-        }
-        result.classList.remove('hidden');
-      }, 2000);
-    });
-    document.getElementById('getBoilerplate').addEventListener('click', () => {
-      const genError = document.getElementById('genError');
-      genError.classList.add('hidden');
-      const isPro = false;
-      if (!isPro) {
-        genError.textContent = '🔒 This feature requires SecureAPI Pro. Please upgrade to continue.';
-        genError.classList.remove('hidden');
-        return;
-      }
-      alert('📁 Simulating download of a secure AI boilerplate...');
-    });
-    document.getElementById('generateApi').addEventListener('click', () => {
-      const genError = document.getElementById('genError');
-      genError.classList.add('hidden');
-      const isPro = false;
-      if (!isPro) {
-        genError.textContent = '🔒 This feature requires SecureAPI Pro. Please upgrade to continue.';
-        genError.classList.remove('hidden');
-        return;
-      }
-      alert('⚙️ Simulating setup of a GitHub Action workflow...');
-    });
-    window.downloadSecuredProject = function() {
-      alert('📁 In a real app, this would download your secured project as a ZIP file.');
-    };
-  </script>
+
+      resultDiv.appendChild(successMessage);
+      
+      // Create and add the download link
+      const downloadButton = createDownloadLink('secured-project.zip', data.downloadData);
+      resultDiv.appendChild(downloadButton);
+
+      resultDiv.classList.remove('hidden');
+
+    } catch (err) {
+      errorDiv.textContent = err.message;
+      errorDiv.classList.remove('hidden');
+    } finally {
+      loading.classList.add('hidden');
+    }
+  });
+
+  // Your other button listeners can stay here
+  document.getElementById('clearFile').addEventListener('click', () => { /* ... */ });
+</script>
 </body>
 </html>
