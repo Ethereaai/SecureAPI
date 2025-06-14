@@ -1,24 +1,6 @@
 // functions/generate.js
 
-const OpenAI = require('openai');
-
-// This is the critical change. We create a custom fetch function
-// to ensure all requests go ONLY to the OpenRouter baseURL.
-const customFetch = (url, options) => {
-  const newUrl = new URL(url, process.env.FREE_MODEL_BASE_URL).toString();
-  return fetch(newUrl, options);
-};
-
-// Now we initialize the client with this custom fetch behavior.
-const api = new OpenAI({
-  apiKey: process.env.FREE_MODEL_API_KEY,
-  baseURL: process.env.FREE_MODEL_BASE_URL, // Keep this for completeness
-  fetch: customFetch, // This forces the client to use our custom logic
-  defaultHeaders: {
-    'HTTP-Referer': 'https://secureapi.online',
-    'X-Title': 'SecureAPI',
-  },
-});
+// We are NOT using the 'openai' library anymore. We use the built-in fetch.
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
@@ -48,14 +30,43 @@ exports.handler = async function (event) {
     5. The entire output must be ONLY the YAML code, enclosed in a single markdown code block with the language set to yaml. Do not include any other text or explanations.
   `;
 
+  // --- We build the request manually ---
+
+  // The specific API endpoint for OpenRouter's chat completions
+  const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+
+  // The headers required by OpenRouter
+  const headers = {
+    'Authorization': `Bearer ${process.env.FREE_MODEL_API_KEY}`,
+    'Content-Type': 'application/json',
+    'HTTP-Referer': 'https://secureapi.online',
+    'X-Title': 'SecureAPI',
+  };
+
+  // The body of the request, formatted as JSON
+  const body = JSON.stringify({
+    model: 'mistralai/devstral-small',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.1,
+  });
+
   try {
-    const completion = await api.chat.completions.create({
-      model: 'mistralai/devstral-small',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.1,
+    // We use the standard 'fetch' command. No library, no magic.
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: headers,
+      body: body,
     });
 
-    const generatedYml = completion.choices[0].message.content;
+    const data = await response.json();
+
+    // If the response is not OK, we throw the error from the API itself.
+    if (!response.ok) {
+      console.error('OpenRouter API Error:', data);
+      throw new Error(data.error?.message || 'Failed to generate workflow file.');
+    }
+    
+    const generatedYml = data.choices[0].message.content;
     const cleanedYml = generatedYml.replace(/```yaml\n|```/g, '').trim();
 
     return {
@@ -65,7 +76,7 @@ exports.handler = async function (event) {
     };
 
   } catch (err) {
-    console.error('API error:', err);
+    console.error('Top-level error:', err);
     return { statusCode: 500, body: JSON.stringify({ error: 'Failed to generate the workflow file. The free model may be temporarily unavailable.' }) };
   }
 };
