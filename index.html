@@ -384,7 +384,7 @@
       }
 
       // Show redacted items
-      if (data.redactedKeys && data.redactedKeys.length > 0) {
+      if (.redactedKeys && data.redactedKeys.length > 0) {
         const warningAlert = document.createElement('div');
         warningAlert.className = 'p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg';
         warningAlert.innerHTML = `
@@ -461,21 +461,29 @@
     }
   });
 
-  // Event listeners for pro features
-  document.getElementById('getBoilerplate').addEventListener('click', () => {
-    alert('This is a Pro feature.');
-  });
-  document.getElementById('generateApi').addEventListener('click', () => {
-    alert('This is a Pro feature.');
-  });
-  document.getElementById('upgradePro').addEventListener('click', () => {
-    alert('Redirecting to checkout...');
-  });
-  document.getElementById('freeSignup').addEventListener('click', () => {
-    document.querySelector('#upload').scrollIntoView({ behavior: 'smooth' });
-  });
-   // --- ADD THIS LINE FOR THE DYNAMIC YEAR ---
-  document.getElementById('copyright-year').textContent = new Date().getFullYear();
+  // --- NEWLY ADDED/FIXED EVENT LISTENERS ---
+
+  // Fix for Pricing Section buttons
+  const freeSignupBtn = document.getElementById('freeSignup');
+  if (freeSignupBtn) {
+    freeSignupBtn.addEventListener('click', () => {
+      document.getElementById('upload').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  const upgradeProBtn = document.getElementById('upgradePro');
+  if (upgradeProBtn) {
+    upgradeProBtn.addEventListener('click', () => {
+      alert('Redirecting to Pro checkout...');
+      // In a real app, this would be: window.location.href = '/checkout-url';
+    });
+  }
+
+  // Fix for the footer copyright year
+  const copyrightYearSpan = document.getElementById('copyright-year');
+  if (copyrightYearSpan) {
+    copyrightYearSpan.textContent = new Date().getFullYear();
+  }
 
 </script>
 </body>
