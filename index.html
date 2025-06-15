@@ -182,35 +182,53 @@
             <h2 class="text-3xl font-bold">Simple, Fair Pricing</h2>
             <p class="mt-2 text-gray-600">Start for free. Upgrade when you want to build faster.</p>
         </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div class="border border-gray-200 rounded-xl p-8 flex flex-col hover:shadow-md transition">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+        
+        <!-- Free Plan -->
+        <div class="border border-gray-200 rounded-xl p-8 flex flex-col hover:shadow-md transition h-full">
             <h3 class="text-xl font-semibold mb-1">Free</h3>
             <p class="text-gray-600 mb-6">For getting your first projects live.</p>
             <div class="flex items-baseline mb-8"><span class="text-4xl font-bold">€0</span><span class="ml-1 text-gray-500">/forever</span></div>
             <ul class="space-y-3 mb-8 text-gray-600">
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>3 scans per month</li>
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Secure code downloads</li>
-              <li class="flex items-center"><i data-lucide="x" class="w-4 h-4 mr-2 text-gray-400"></i>AI Template Library</li>
-              <li class="flex items-center"><i data-lucide="x" class="w-4 h-4 mr-2 text-gray-400"></i>Guided GitHub Actions</li>
+              <li class="flex items-center"><i data-lucide="x" class="w-4 h-4 mr-2 text-gray-400"></i>One-Click Deployment</li>
+              <li class="flex items-center"><i data-lucide="x" class="w-4 h-4 mr-2 text-gray-400"></i>Priority support</li>
             </ul>
             <button id="freeSignup" class="mt-auto w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-md transition">Get Started</button>
         </div>
-        <div class="border-2 border-indigo-500 rounded-xl p-8 flex flex-col shadow-lg transform hover:scale-105">
-          <div class="text-center"><h3 class="text-2xl font-semibold mb-1">Pro</h3><p class="text-indigo-600 mb-6">For building and launching faster.</p><div class="flex items-baseline justify-center mb-8"><span class="text-4xl font-bold">€9</span><span class="ml-1 text-gray-500">/month</span></div></div>
+
+        <!-- Pro Plan -->
+        <div class="relative border-2 border-indigo-500 rounded-xl p-8 flex flex-col shadow-lg transform hover:scale-105 h-full">
+          <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
+            <span class="inline-flex items-center px-4 py-1 rounded-full text-sm font-bold bg-indigo-500 text-white">BEST VALUE</span>
+          </div>
+          <div class="text-center pt-4"><h3 class="text-2xl font-semibold mb-1">Pro</h3><p class="text-indigo-600 mb-6">For building and launching faster.</p><div class="flex items-baseline justify-center mb-8"><span class="text-4xl font-bold">€9</span><span class="ml-1 text-gray-500">/month</span></div></div>
           <ul class="space-y-3 mb-8 text-gray-600">
-              <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Unlimited scans</li>
+              <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i><span class="font-bold">30</span> scans per month</li>
+              <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>One-Click Deployment Concierge</li>
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>GitHub integration</li>
-              <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>AI Template Library</li>
-              <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Guided GitHub Actions</li>
               <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2 text-green-500"></i>Priority support</li>
           </ul>
           <button id="upgradePro" class="mt-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-md transition">Upgrade to Pro</button>
         </div>
-        <div class="coming-soon-box border-2 border-dashed border-gray-300 rounded-xl text-center p-8 flex flex-col justify-center items-center">
-          <h3 class="text-xl font-semibold text-gray-700 mb-2">Enterprise</h3>
-          <p class="text-sm text-gray-500 mb-4">Custom solutions for teams and educators.</p>
-          <span class="inline-block bg-indigo-100 text-indigo-700 font-medium px-4 py-1 rounded-full text-sm shadow-sm">🚧 Coming Soon</span>
+
+        <!-- Scale Plan (Coming Soon) -->
+        <div class="border border-gray-200 rounded-xl p-8 flex flex-col h-full">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="text-xl font-semibold text-gray-700">Scale</h3>
+            <span class="inline-block bg-gray-200 text-gray-600 font-semibold px-3 py-1 rounded-full text-xs">COMING SOON</span>
+          </div>
+          <p class="text-gray-500 mb-6">For teams and power users.</p>
+          <p class="text-gray-400 mb-8">Custom scan limits, team management, and dedicated support.</p>
+          <ul class="space-y-3 mb-8 text-gray-400">
+            <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2"></i>Increased scan limits</li>
+            <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2"></i>Team-based workflows</li>
+            <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 mr-2"></i>SAML SSO integration</li>
+          </ul>
+          <button disabled class="mt-auto w-full bg-gray-200 text-gray-500 font-medium py-2 px-4 rounded-md cursor-not-allowed">Contact Sales</button>
         </div>
+
       </div>
     </div>
 </section>
