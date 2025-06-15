@@ -30,6 +30,112 @@ We've moved your hard-coded API keys and secrets into a new \`.env\` file where 
 Happy (and safe) shipping!
 `;
 
+// Function to create dynamic README based on actual results
+function createDynamicReadme(hasRefactoredKeys, hasRedactedKeys, refactoredKeys, redactedKeys) {
+  let readme = "# Your Project Has Been Secured by SecureAPI! 🛡️\n\n";
+  
+  if (hasRefactoredKeys || hasRedactedKeys) {
+    readme += "## What We Found and Fixed\n\n";
+    
+    if (hasRefactoredKeys) {
+      readme += `### ✅ Refactored Secrets (${refactoredKeys.length})\n`;
+      readme += "The following hard-coded secrets were automatically moved to your `.env` file and replaced with environment variables:\n\n";
+      refactoredKeys.forEach(key => {
+        readme += `- **${key}** - Now loaded via \`process.env.${key}\`\n`;
+      });
+      readme += "\n";
+    }
+    
+    if (hasRedactedKeys) {
+      readme += `### ⚠️ Redacted Secrets (${redactedKeys.length})\n`;
+      readme += "The following potential secrets were found and redacted. **You need to manually add these to your `.env` file:**\n\n";
+      redactedKeys.forEach(key => {
+        readme += `- **${key}** - Replaced with \`***REDACTED_BY_SECUREAPI***\` in your code\n`;
+      });
+      readme += "\n";
+    }
+    
+    readme += "## Your Next Steps\n\n";
+    readme += "1. **Install dotenv:** Run `npm install dotenv` in your terminal\n";
+    readme += "2. **Load environment variables:** Add `require('dotenv').config();` to the top of your main application file\n";
+    
+    if (hasRedactedKeys) {
+      readme += "3. **Handle redacted secrets:** Replace the `***REDACTED_BY_SECUREAPI***` placeholders in your code with proper environment variable calls\n";
+      readme += "4. **Update your .env file:** Add the redacted secrets to your `.env` file using the comments as guidance\n";
+    }
+    
+    readme += `${hasRedactedKeys ? '5' : '3'}. **Secure your .env:** Your \`.gitignore\` has been updated to exclude \`.env\` from version control\n\n`;
+    
+  } else {
+    readme += "## Great News! 🎉\n\n";
+    readme += "No hard-coded secrets were found in your project. Your code appears to be secure!\n\n";
+    readme += "## Best Practices Reminder\n\n";
+    readme += "- Always use environment variables for API keys and secrets\n";
+    readme += "- Keep your `.env` file in `.gitignore`\n";
+    readme += "- Use different environment files for development, staging, and production\n\n";
+  }
+  
+  readme += "## How Environment Variables Work\n\n";
+  readme += "```javascript\n";
+  readme += "// Instead of this:\n";
+  readme += "const apiKey = 'sk-1234567890abcdef';\n\n";
+  readme += "// Do this:\n";
+  readme += "require('dotenv').config();\n";
+  readme += "const apiKey = process.env.OPENAI_API_KEY;\n";
+  readme += "```\n\n";
+  readme += "## Support\n\n";
+  readme += "If you have questions about implementing these changes, refer to the [dotenv documentation](https://www.npmjs.com/package/dotenv).\n\n";
+  readme += "---\n";
+  readme += "*Secured by SecureAPI - Keeping your secrets safe!*\n";
+  
+  return readme;
+}
+
+// Function to create or update .gitignore file
+function createOrUpdateGitignore(srcZip) {
+  let existingGitignore = "";
+  
+  // Check if .gitignore already exists
+  const gitignoreEntry = srcZip.getEntries().find(entry => entry.entryName === '.gitignore' || entry.entryName.endsWith('/.gitignore'));
+  if (gitignoreEntry) {
+    try {
+      existingGitignore = srcZip.readAsText(gitignoreEntry, "utf8");
+    } catch (error) {
+      // If we can't read it, start fresh
+      existingGitignore = "";
+    }
+  }
+  
+  // Common entries that should be in .gitignore for security
+  const securityEntries = [
+    '.env',
+    '.env.local',
+    '.env.*.local',
+    '*.log',
+    'npm-debug.log*',
+    'yarn-debug.log*',
+    'yarn-error.log*'
+  ];
+  
+  let gitignoreContent = existingGitignore;
+  
+  // Add header comment if this is a new or empty .gitignore
+  if (!gitignoreContent.trim()) {
+    gitignoreContent = "# Environment variables and secrets\n";
+  } else if (!gitignoreContent.includes("# SecureAPI")) {
+    gitignoreContent += "\n\n# Added by SecureAPI for security\n";
+  }
+  
+  // Add missing security entries
+  securityEntries.forEach(entry => {
+    if (!gitignoreContent.includes(entry)) {
+      gitignoreContent += entry + "\n";
+    }
+  });
+  
+  return gitignoreContent;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: JSON.stringify({ error: "Method Not Allowed" }) };
@@ -175,17 +281,44 @@ exports.handler = async (event) => {
 
     // Create .env file with all extracted variables
     let envContent = "";
-    if (Object.keys(envVars).length > 0) {
-      envContent = Object.entries(envVars)
+    const hasRefactoredKeys = Object.keys(envVars).length > 0;
+    const hasRedactedKeys = redactedSet.size > 0;
+    
+    if (hasRefactoredKeys) {
+      envContent = "# Environment variables extracted by SecureAPI\n";
+      envContent += "# Load these with: require('dotenv').config()\n\n";
+      envContent += Object.entries(envVars)
         .map(([key, value]) => `${key}="${value}"`)
         .join("\n") + "\n";
-    } else {
-      envContent = "# No secrets were automatically extracted. Add any redacted secrets here.\n# EXAMPLE: MY_API_KEY=\"value\"\n";
     }
+    
+    if (hasRedactedKeys) {
+      if (hasRefactoredKeys) envContent += "\n";
+      envContent += "# REDACTED SECRETS - Please add these manually:\n";
+      envContent += "# The following secrets were found and redacted from your code.\n";
+      envContent += "# Replace the redacted placeholders with these actual values:\n\n";
+      Array.from(redactedSet).forEach(redacted => {
+        const varName = redacted.replace(/[^A-Za-z0-9]/g, '_').toUpperCase().substring(0, 20);
+        envContent += `# ${varName}="your_actual_secret_here"  # Was: ${redacted}\n`;
+      });
+    }
+    
+    if (!hasRefactoredKeys && !hasRedactedKeys) {
+      envContent = "# No secrets were automatically extracted. Your project looks secure!\n";
+      envContent += "# If you need to add environment variables, use this format:\n";
+      envContent += "# MY_API_KEY=\"your_value_here\"\n";
+    }
+
+    // Create dynamic README based on what was actually done
+    const dynamicReadme = createDynamicReadme(hasRefactoredKeys, hasRedactedKeys, Object.keys(envVars), Array.from(redactedSet));
+
+    // Create or update .gitignore to include .env
+    const gitignoreContent = createOrUpdateGitignore(srcZip);
 
     // Always add the .env file and README
     securedZip.addFile(".env", Buffer.from(envContent, "utf8"));
-    securedZip.addFile("README-SECUREAPI.md", Buffer.from(README_CONTENT, "utf8"));
+    securedZip.addFile("README-SECUREAPI.md", Buffer.from(dynamicReadme, "utf8"));
+    securedZip.addFile(".gitignore", Buffer.from(gitignoreContent, "utf8"));
 
   } catch (err) {
     console.error("Zip-processing error:", err);
