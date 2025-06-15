@@ -251,12 +251,42 @@
     loading.classList.add('hidden');
   }
 
+  function showError(message) {
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+    loading.classList.add('hidden');
+    fileActionsDiv.classList.remove('hidden');
+  }
+
+  function validateFile(file) {
+    // Check file type
+    if (!file.name.toLowerCase().endsWith('.zip')) {
+      return 'Please select a ZIP file.';
+    }
+    
+    // Check file size (limit to 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      return 'File size must be less than 10MB.';
+    }
+    
+    return null;
+  }
+
   // --- EVENT LISTENERS ---
   chooseFileBtn.addEventListener('click', () => fileInput.click());
 
   fileInput.addEventListener('change', () => {
       if (fileInput.files.length > 0) {
-          fileNameSpan.textContent = fileInput.files[0].name;
+          const file = fileInput.files[0];
+          const validationError = validateFile(file);
+          
+          if (validationError) {
+              showError(validationError);
+              resetUI();
+              return;
+          }
+          
+          fileNameSpan.textContent = file.name;
           chooseFileBtn.classList.add('hidden');
           fileActionsDiv.classList.remove('hidden');
           errorDiv.classList.add('hidden');
@@ -275,10 +305,16 @@
     
     const file = fileInput.files[0];
     if (!file) {
-      errorDiv.textContent = 'Please select a file to upload.';
-      errorDiv.classList.remove('hidden');
+      showError('Please select a file to upload.');
       return;
     }
+
+    const validationError = validateFile(file);
+    if (validationError) {
+      showError(validationError);
+      return;
+    }
+
     loading.classList.remove('hidden');
     fileActionsDiv.classList.add('hidden');
 
@@ -289,7 +325,7 @@
           const base64String = reader.result.split(',')[1];
           resolve(base64String);
         };
-        reader.onerror = reject;
+        reader.onerror = () => reject(new Error('Failed to read file'));
       });
       reader.readAsDataURL(file);
       const fileData = await fileReadPromise;
@@ -308,53 +344,102 @@
           throw new Error(data.error || `Server responded with status ${response.status}`);
       }
       
+      // Create success display
       const successBox = document.createElement('div');
       successBox.className = 'text-left space-y-4';
 
+      // Show refactored keys
       if (data.refactoredKeys && data.refactoredKeys.length > 0) {
-        const ok = document.createElement('div');
-        ok.className = 'p-3 bg-green-50 text-green-800 rounded-md';
-        ok.innerHTML = `✅ <strong>Success!</strong> Refactored ${data.refactoredKeys.length} key(s) into a new <strong>.env</strong> file. See the README for next steps.`;
-        successBox.appendChild(ok);
+        const successAlert = document.createElement('div');
+        successAlert.className = 'p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg';
+        successAlert.innerHTML = `
+          <div class="flex items-start">
+            <div class="text-green-600 mr-3 mt-0.5">✅</div>
+            <div>
+              <h4 class="font-semibold mb-2">Success! Refactored ${data.refactoredKeys.length} secret(s)</h4>
+              <p class="text-sm mb-2">The following secrets were moved to a new <code class="bg-green-100 px-1 rounded">.env</code> file:</p>
+              <ul class="text-xs font-mono bg-green-100 p-2 rounded list-disc list-inside">
+                ${data.refactoredKeys.map(key => `<li>${key}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+        successBox.appendChild(successAlert);
       }
 
+      // Show redacted items
       if (data.redactedKeys && data.redactedKeys.length > 0) {
-        const warn = document.createElement('div');
-        warn.className = 'p-3 bg-yellow-50 text-yellow-800 rounded-md';
-        warn.innerHTML = `⚠️ <strong>Warning:</strong> Found and redacted ${data.redactedKeys.length} other potential secret(s) that require manual review:<div class="font-mono text-xs mt-2">${data.redactedKeys.join('<br>')}</div>`;
-        successBox.appendChild(warn);
+        const warningAlert = document.createElement('div');
+        warningAlert.className = 'p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg';
+        warningAlert.innerHTML = `
+          <div class="flex items-start">
+            <div class="text-yellow-600 mr-3 mt-0.5">⚠️</div>
+            <div>
+              <h4 class="font-semibold mb-2">Manual Review Required</h4>
+              <p class="text-sm mb-2">Found and redacted ${data.redactedKeys.length} potential secret(s) that need manual review:</p>
+              <ul class="text-xs font-mono bg-yellow-100 p-2 rounded list-disc list-inside">
+                ${data.redactedKeys.map(key => `<li>${key}</li>`).join('')}
+              </ul>
+              <p class="text-sm mt-2">These have been replaced with <code class="bg-yellow-100 px-1 rounded">***REDACTED_BY_SECUREAPI***</code> in your code.</p>
+            </div>
+          </div>
+        `;
+        successBox.appendChild(warningAlert);
       }
 
-      if ((!data.refactoredKeys || !data.refactoredKeys.length) && (!data.redactedKeys || !data.redactedKeys.length)) {
-        successBox.innerHTML = `<div class="p-3 bg-green-50 text-green-800 rounded-md">✅ No hard-coded keys found. Your project looks good! You have ${data.remainingScans} scans left.</div>`;
+      // Show clean result if no issues found
+      if ((!data.refactoredKeys || data.refactoredKeys.length === 0) && 
+          (!data.redactedKeys || data.redactedKeys.length === 0)) {
+        const cleanAlert = document.createElement('div');
+        cleanAlert.className = 'p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg';
+        cleanAlert.innerHTML = `
+          <div class="flex items-start">
+            <div class="text-blue-600 mr-3 mt-0.5">🛡️</div>
+            <div>
+              <h4 class="font-semibold mb-1">No Hard-coded Secrets Found</h4>
+              <p class="text-sm">Your project looks secure! You have ${data.remainingScans} scan(s) remaining.</p>
+            </div>
+          </div>
+        `;
+        successBox.appendChild(cleanAlert);
       }
 
       resultDiv.appendChild(successBox);
       
+      // Create action buttons
       const buttonContainer = document.createElement('div');
-      buttonContainer.className = 'mt-4 flex flex-wrap items-center justify-center gap-4';
+      buttonContainer.className = 'mt-6 flex flex-wrap items-center justify-center gap-4';
 
-      const dl = document.createElement('a');
-      dl.href        = `data:application/zip;base64,${data.downloadData}`;
-      dl.download    = 'secured-project.zip';
-      dl.className   = 'inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition';
-      dl.textContent = '⬇️ Download Secured Project';
-      buttonContainer.appendChild(dl);
+      // Download button
+      const downloadBtn = document.createElement('a');
+      downloadBtn.href = `data:application/zip;base64,${data.downloadData}`;
+      downloadBtn.download = `secured-${file.name}`;
+      downloadBtn.className = 'inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-colors';
+      downloadBtn.innerHTML = '⬇️ Download Secured Project';
+      buttonContainer.appendChild(downloadBtn);
 
-      const uploadAnotherButton = document.createElement('button');
-      uploadAnotherButton.type = 'button';
-      uploadAnotherButton.className = "inline-block bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2 rounded-md text-sm font-semibold transition";
-      uploadAnotherButton.textContent = 'Scan Another File';
-      uploadAnotherButton.addEventListener('click', resetUI);
-      buttonContainer.appendChild(uploadAnotherButton);
+      // Scan another button
+      const scanAnotherBtn = document.createElement('button');
+      scanAnotherBtn.type = 'button';
+      scanAnotherBtn.className = "inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg text-sm font-semibold transition-colors";
+      scanAnotherBtn.innerHTML = '🔄 Scan Another File';
+      scanAnotherBtn.addEventListener('click', resetUI);
+      buttonContainer.appendChild(scanAnotherBtn);
+      
+      // Remaining scans info
+      if (data.remainingScans !== undefined) {
+        const remainingInfo = document.createElement('div');
+        remainingInfo.className = 'w-full text-center text-sm text-gray-600 mt-2';
+        remainingInfo.textContent = `${data.remainingScans} scan(s) remaining this month`;
+        buttonContainer.appendChild(remainingInfo);
+      }
       
       resultDiv.appendChild(buttonContainer);
       resultDiv.classList.remove('hidden');
       
     } catch (err) {
-        errorDiv.textContent = err.message || 'An unknown error occurred.';
-        errorDiv.classList.remove('hidden');
-        fileActionsDiv.classList.remove('hidden');
+        console.error('Upload error:', err);
+        showError(err.message || 'An unknown error occurred while processing your file.');
     } finally {
       loading.classList.add('hidden');
     }
