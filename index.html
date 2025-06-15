@@ -218,7 +218,7 @@
       </a>
     </div>
     <div class="py-10 text-center text-sm text-gray-500 border-t">
-      © 2025 SecureAPI. All rights reserved.
+      © <span id="copyright-year"></span> SecureAPI. All rights reserved.
     </div>
 </footer>
 
@@ -458,6 +458,8 @@
   document.getElementById('freeSignup').addEventListener('click', () => {
     document.querySelector('#upload').scrollIntoView({ behavior: 'smooth' });
   });
+   // --- ADD THIS LINE FOR THE DYNAMIC YEAR ---
+  document.getElementById('copyright-year').textContent = new Date().getFullYear();
 
 </script>
 </body>
