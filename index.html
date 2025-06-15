@@ -137,24 +137,32 @@
 <!-- Pro Features Upsell Section -->
 <section id="pro-features" class="py-20 px-6 bg-gray-50">
     <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl font-bold">Build Even Faster with SecureAPI Pro</h2>
-      <p class="mt-2 mb-8 text-gray-600">Solve common beginner roadblocks with our powerful Pro toolkit.</p>
-      <div class="grid md:grid-cols-2 gap-8 text-left">
-          <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center mb-3">
-                <i data-lucide="bot" class="w-8 h-8 text-indigo-500 mr-4"></i>
-                <h3 class="text-xl font-semibold">AI Template Library</h3>
+      <h2 class="text-3xl font-bold">Go from Code to Live URL in 90 Seconds</h2>
+      <p class="mt-2 mb-8 text-gray-600">SecureAPI Pro is your personal deployment assistant. We handle the entire setup for you.</p>
+      <div class="grid grid-cols-1 gap-8 text-left">
+          
+          <!-- The Single, Focused Pro Feature Card -->
+          <div class="bg-white p-6 rounded-xl border border-indigo-500/50 shadow-lg">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center mb-4">
+                <div class="flex items-center flex-shrink-0 mb-3 sm:mb-0">
+                  <i data-lucide="rocket" class="w-8 h-8 text-indigo-500 mr-4"></i>
+                  <h3 class="text-xl font-semibold">One-Click Deployment Concierge</h3>
+                </div>
+                <span class="sm:ml-auto bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-full">PRO FEATURE</span>
             </div>
-            <p class="text-gray-600 mb-4">Get started with secure, pre-built templates for LangChain, RAG chatbots, and more.</p>
-            <button id="getBoilerplate" class="w-full bg-indigo-100 text-indigo-700 font-semibold py-2 px-4 rounded-md hover:bg-indigo-200 transition">Get Templates (Pro)</button>
+            <p class="text-gray-600 mb-6">Stop wasting time on confusing configurations. We automatically create a private GitHub repository for your project and deploy it to a live URL on your favorite hosting provider (like Netlify or Vercel).</p>
+            
+            <div class="bg-gray-50/75 border border-gray-200 p-4 rounded-lg">
+                <p class="text-sm font-semibold text-gray-700 mb-2">The Pro Workflow:</p>
+                <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
+                    <li>Choose your secured project.</li>
+                    <li>Connect your GitHub & Netlify/Vercel accounts (one-time setup).</li>
+                    <li>We build the repository, configure secrets, and deploy your app.</li>
+                    <li>You get a live URL, ready to share. It's that simple.</li>
+                </ol>
+            </div>
           </div>
-          <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center mb-3">
-                <i data-lucide="github" class="w-8 h-8 text-gray-800 mr-4"></i>
-                <h3 class="text-xl font-semibold">Guided GitHub Deployment</h3>
-            </div>
-            <p class="text-gray-600 mb-4">Automatically create a secure deployment workflow (GitHub Action) for your repository.</p>
-            <button id="generateApi" class="w-full bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 transition">Setup Workflow (Pro)</button>          </div>
+
       </div>
     </div>
 </section>
@@ -218,7 +226,7 @@
       </a>
     </div>
     <div class="py-10 text-center text-sm text-gray-500 border-t">
-      © <span id="copyright-year"></span> SecureAPI. All rights reserved.
+      © <span id="copyright-year"></span> SecureAPI | All rights reserved.
     </div>
 </footer>
 
